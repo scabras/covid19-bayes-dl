@@ -53,7 +53,7 @@ cvirus=cvirus.ccaa.fat
 dim(cvirus)
 ```
 
-We have `r nrow(cvirus)` days (in the range `r range(cvirus$fecha)`)  and `r ncol(cvirus)` variables which represent the cumulative incidence at 14 days per 100000 people along the regions.
+We have `r nrow(cvirus)` days (in the range `r range(cvirus$day)`)  and `r ncol(cvirus)` variables which represent the cumulative incidence at 14 days per 100000 people along the regions.
 
 
 These are daily cumulative 14 days incidence :
