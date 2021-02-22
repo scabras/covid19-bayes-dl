@@ -160,6 +160,7 @@ These are the errors depending on how many days before was made the prediction (
 ```{r lstmerror}
 p=ggplot(allerror,aes(x=factor(delay),y=error))+
   facet_wrap(. ~ region)+geom_violin()
+p
 pdf(file="../sort/fig/errors.pdf")
 p
 dev.off()
