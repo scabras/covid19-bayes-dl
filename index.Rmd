@@ -2,15 +2,11 @@
 title: "Bayes-DL Covid-19"
 author: "Stefano Cabras"
 date: '`r format(Sys.time())` '
-site: bookdown::bookdown_site
-documentclass: book
-output:
-  bookdown::gitbook: default
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
 rm(list=ls())
-setwd("~/gd/Articulos/elvirusdelacorona/covid19-bayes-dl/")
 knitr::opts_chunk$set(echo = TRUE,warning = FALSE)
 library(reticulate)
 library(reshape2)
