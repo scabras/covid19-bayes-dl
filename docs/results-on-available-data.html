@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>5 Results on available data | Bayes-DL Covid-19</title>
+  <meta name="description" content="5 Results on available data | Bayes-DL Covid-19" />
+  <meta name="generator" content="bookdown 0.21 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="5 Results on available data | Bayes-DL Covid-19" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="5 Results on available data | Bayes-DL Covid-19" />
+  
+  
+  
+
+<meta name="author" content="Stefano Cabras" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="bayesian-model.html"/>
+<link rel="next" href="what-if-scenarios-and-predictions.html"/>
+<script src="libs/jquery-3.5.1/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
+<link href="libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet" />
+<script src="libs/datatables-binding-0.17/datatables.js"></script>
+<link href="libs/dt-core-1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="libs/dt-core-1.10.20/css/jquery.dataTables.extra.css" rel="stylesheet" />
+<script src="libs/dt-core-1.10.20/js/jquery.dataTables.min.js"></script>
+<link href="libs/crosstalk-1.1.1/css/crosstalk.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.1.1/js/crosstalk.min.js"></script>
+
+
+<style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Data preparation</a></li>
+<li class="chapter" data-level="2" data-path="model.html"><a href="model.html"><i class="fa fa-check"></i><b>2</b> Model</a></li>
+<li class="chapter" data-level="3" data-path="lstm-estimation.html"><a href="lstm-estimation.html"><i class="fa fa-check"></i><b>3</b> LSTM Estimation</a><ul>
+<li class="chapter" data-level="3.1" data-path="lstm-estimation.html"><a href="lstm-estimation.html#model-train"><i class="fa fa-check"></i><b>3.1</b> Model train</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="bayesian-model.html"><a href="bayesian-model.html"><i class="fa fa-check"></i><b>4</b> Bayesian model</a></li>
+<li class="chapter" data-level="5" data-path="results-on-available-data.html"><a href="results-on-available-data.html"><i class="fa fa-check"></i><b>5</b> Results on available data</a><ul>
+<li class="chapter" data-level="5.1" data-path="results-on-available-data.html"><a href="results-on-available-data.html#incidence-by-region"><i class="fa fa-check"></i><b>5.1</b> Incidence by region</a></li>
+<li class="chapter" data-level="5.2" data-path="results-on-available-data.html"><a href="results-on-available-data.html#incidence-for-spain"><i class="fa fa-check"></i><b>5.2</b> Incidence for Spain</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="what-if-scenarios-and-predictions.html"><a href="what-if-scenarios-and-predictions.html"><i class="fa fa-check"></i><b>6</b> What if scenarios and predictions</a><ul>
+<li class="chapter" data-level="6.1" data-path="what-if-scenarios-and-predictions.html"><a href="what-if-scenarios-and-predictions.html#scenario-1."><i class="fa fa-check"></i><b>6.1</b> Scenario 1.</a></li>
+<li class="chapter" data-level="6.2" data-path="what-if-scenarios-and-predictions.html"><a href="what-if-scenarios-and-predictions.html#scenario-2."><i class="fa fa-check"></i><b>6.2</b> Scenario 2.</a></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Bayes-DL Covid-19</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="results-on-available-data" class="section level1">
+<h1><span class="header-section-number">5</span> Results on available data</h1>
+<p>These are the prediction of the incidence given the observed data: posterior predictive and prior predictive (according to the LSTM “expert” elicitation).</p>
+<div id="incidence-by-region" class="section level2">
+<h2><span class="header-section-number">5.1</span> Incidence by region</h2>
+<p>For each region here is the observed incidence along with predictive posterior summaries: median (red) and 95% credible intervals (grey):</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" title="1">toplot=<span class="kw">subset</span>(final.res,day<span class="op">&gt;</span><span class="kw">as.Date</span>(<span class="st">&quot;2021-01-01&quot;</span>))</a>
+<a class="sourceLine" id="cb24-2" title="2">pmax=<span class="kw">ggplot</span>(toplot,<span class="kw">aes</span>(<span class="dt">x=</span>day,<span class="dt">y=</span>observed))<span class="op">+</span><span class="kw">geom_line</span>()<span class="op">+</span></a>
+<a class="sourceLine" id="cb24-3" title="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>day,<span class="dt">y=</span>median),<span class="dt">colour=</span><span class="st">&quot;red&quot;</span>)<span class="op">+</span></a>
+<a class="sourceLine" id="cb24-4" title="4"><span class="st">  </span><span class="kw">geom_ribbon</span>(<span class="kw">aes</span>(<span class="dt">x=</span>day,<span class="dt">ymin=</span>ici,<span class="dt">ymax=</span>sci),<span class="dt">alpha =</span> <span class="fl">0.5</span>)<span class="op">+</span></a>
+<a class="sourceLine" id="cb24-5" title="5"><span class="st">              </span><span class="kw">facet_wrap</span>(. <span class="op">~</span><span class="st"> </span>region)<span class="op">+</span></a>
+<a class="sourceLine" id="cb24-6" title="6"><span class="st">              </span><span class="kw">theme</span>(<span class="dt">axis.text.x =</span> <span class="kw">element_text</span>(<span class="dt">angle =</span> <span class="dv">90</span>,<span class="dt">size=</span><span class="kw">rel</span>(<span class="fl">0.8</span>)))</a>
+<a class="sourceLine" id="cb24-7" title="7">pmax</a></code></pre></div>
+<p><img src="_main_files/figure-html/regpredinc-1.svg" width="672" /></p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" title="1"><span class="kw">pdf</span>(<span class="dt">file=</span><span class="st">&quot;../sort/fig/bayes-preds1.pdf&quot;</span>)</a>
+<a class="sourceLine" id="cb25-2" title="2">pmax</a>
+<a class="sourceLine" id="cb25-3" title="3"><span class="kw">dev.off</span>()</a></code></pre></div>
+<pre><code>## svg 
+##   2</code></pre>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" title="1"><span class="kw">datatable</span>(toplot[<span class="kw">is.na</span>(toplot<span class="op">$</span>observed),],<span class="dt">rownames =</span> <span class="ot">NULL</span>)</a></code></pre></div>
+<div id="htmlwidget-a51a626ba8ebbf99388f" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-a51a626ba8ebbf99388f">{"x":{"filter":"none","data":[["2021-02-19","2021-02-20","2021-02-21","2021-02-22","2021-02-23","2021-02-24","2021-02-19","2021-02-20","2021-02-21","2021-02-22","2021-02-23","2021-02-24","2021-02-19","2021-02-20","2021-02-21","2021-02-22","2021-02-23","2021-02-24","2021-02-19","2021-02-20","2021-02-21","2021-02-22","2021-02-23","2021-02-24","2021-02-19","2021-02-20","2021-02-21","2021-02-22","2021-02-23","2021-02-24","2021-02-19","2021-02-20","2021-02-21","2021-02-22","2021-02-23","2021-02-24","2021-02-19","2021-02-20","2021-02-21","2021-02-22","2021-02-23","2021-02-24","2021-02-19","2021-02-20","2021-02-21","2021-02-22","2021-02-23","2021-02-24","2021-02-19","2021-02-20","2021-02-21","2021-02-22","2021-02-23","2021-02-24","2021-02-19","2021-02-20","2021-02-21","2021-02-22","2021-02-23","2021-02-24","2021-02-19","2021-02-20","2021-02-21","2021-02-22","2021-02-23","2021-02-24","2021-02-19","2021-02-20","2021-02-21","2021-02-22","2021-02-23","2021-02-24","2021-02-19","2021-02-20","2021-02-21","2021-02-22","2021-02-23","2021-02-24","2021-02-19","2021-02-20","2021-02-21","2021-02-22","2021-02-23","2021-02-24","2021-02-19","2021-02-20","2021-02-21","2021-02-22","2021-02-23","2021-02-24","2021-02-19","2021-02-20","2021-02-21","2021-02-22","2021-02-23","2021-02-24","2021-02-19","2021-02-20","2021-02-21","2021-02-22","2021-02-23","2021-02-24","2021-02-19","2021-02-20","2021-02-21","2021-02-22","2021-02-23","2021-02-24","2021-02-19","2021-02-20","2021-02-21","2021-02-22","2021-02-23","2021-02-24"],[2,3,4,5,6,7,2,3,4,5,6,7,2,3,4,5,6,7,2,3,4,5,6,7,2,3,4,5,6,7,2,3,4,5,6,7,2,3,4,5,6,7,2,3,4,5,6,7,2,3,4,5,6,7,2,3,4,5,6,7,2,3,4,5,6,7,2,3,4,5,6,7,2,3,4,5,6,7,2,3,4,5,6,7,2,3,4,5,6,7,2,3,4,5,6,7,2,3,4,5,6,7,2,3,4,5,6,7,2,3,4,5,6,7],["AN","AN","AN","AN","AN","AN","AR","AR","AR","AR","AR","AR","AS","AS","AS","AS","AS","AS","CB","CB","CB","CB","CB","CB","CE","CE","CE","CE","CE","CE","CL","CL","CL","CL","CL","CL","CM","CM","CM","CM","CM","CM","CN","CN","CN","CN","CN","CN","CT","CT","CT","CT","CT","CT","EX","EX","EX","EX","EX","EX","GA","GA","GA","GA","GA","GA","IB","IB","IB","IB","IB","IB","MC","MC","MC","MC","MC","MC","MD","MD","MD","MD","MD","MD","ML","ML","ML","ML","ML","ML","NC","NC","NC","NC","NC","NC","PV","PV","PV","PV","PV","PV","RI","RI","RI","RI","RI","RI","VC","VC","VC","VC","VC","VC"],[267,239,215,194,177,163,274,261,250,240,230,222,290,274,258,242,227,213,206,203,201,198,196,194,227,210,195,181,169,159,251,240,231,223,214,206,235,226,219,214,212,211,86,86,86,86,87,87,253,254,255,258,261,265,115,114,115,118,123,129,210,199,190,182,175,169,172,178,186,195,205,217,134,127,120,114,107,102,254,236,222,212,205,201,344,323,305,289,276,266,227,224,219,214,208,203,261,254,249,245,241,239,203,199,195,193,190,187,238,231,227,225,225,227],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[210,178,151,126,106,89,128,113,99,86,74,64,242,225,207,189,172,156,160,154,149,143,138,133,146,127,109,93,79,67,175,160,145,132,117,103,164,151,138,128,119,112,62,62,61,61,61,61,180,176,172,170,167,166,62,58,55,53,53,53,169,156,144,133,124,115,124,129,136,143,152,161,59,50,41,33,25,18,158,139,123,111,101,94,259,233,210,189,170,154,165,155,143,131,118,107,204,193,184,175,165,157,103,94,85,78,70,61,156,144,135,127,121,117],[266,238,213,192,174,159,265,250,238,227,215,205,289,273,257,241,226,212,205,202,200,197,194,192,224,207,191,176,163,152,249,237,228,219,209,200,233,224,216,210,208,206,86,86,85,85,86,86,251,252,252,255,258,261,112,111,111,114,118,123,209,198,189,181,174,167,171,177,185,194,204,216,129,121,113,106,97,90,250,232,217,207,199,194,342,321,302,286,272,261,225,222,216,211,204,198,260,253,247,243,239,236,197,192,187,184,180,175,235,228,223,220,220,221],[329,307,289,275,264,258,473,469,468,469,471,475,341,327,313,300,288,278,257,257,259,260,263,265,325,313,304,296,291,289,339,335,335,337,338,342,317,315,317,321,329,339,113,113,114,114,116,116,337,345,353,363,374,386,183,188,196,208,221,237,255,247,241,237,234,232,227,234,243,254,265,279,238,239,239,243,246,253,372,357,348,344,344,347,440,426,416,409,406,406,298,304,310,315,321,328,324,322,323,326,330,336,335,341,347,358,368,379,335,337,342,349,359,371]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>day<\/th>\n      <th>delay<\/th>\n      <th>region<\/th>\n      <th>lstm<\/th>\n      <th>observed<\/th>\n      <th>ici<\/th>\n      <th>median<\/th>\n      <th>sci<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[1,3,4,5,6,7]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="incidence-for-spain" class="section level2">
+<h2><span class="header-section-number">5.2</span> Incidence for Spain</h2>
+<p>The same as above but for all Spain in which regions are weighted according to their population.</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" title="1">final.res.spain=<span class="kw">round</span>(final.res[<span class="kw">c</span>(<span class="st">&quot;observed&quot;</span>,<span class="st">&quot;ici&quot;</span>,<span class="st">&quot;median&quot;</span>,<span class="st">&quot;sci&quot;</span>)]<span class="op">*</span>pop<span class="op">$</span>w[final.res<span class="op">$</span>region],<span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb28-2" title="2">final.res.spain=<span class="kw">aggregate</span>(final.res.spain,<span class="dt">by=</span><span class="kw">list</span>(<span class="dt">day=</span>final.res<span class="op">$</span>day,<span class="dt">delay=</span>final.res<span class="op">$</span>delay),sum)</a>
+<a class="sourceLine" id="cb28-3" title="3"></a>
+<a class="sourceLine" id="cb28-4" title="4">toplot=<span class="kw">subset</span>(final.res.spain,day<span class="op">&gt;</span><span class="kw">as.Date</span>(<span class="st">&quot;2021-01-01&quot;</span>))</a>
+<a class="sourceLine" id="cb28-5" title="5">pmax=<span class="kw">ggplot</span>(toplot,<span class="kw">aes</span>(<span class="dt">x=</span>day,<span class="dt">y=</span>observed))<span class="op">+</span><span class="kw">geom_line</span>()<span class="op">+</span></a>
+<a class="sourceLine" id="cb28-6" title="6"><span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">x=</span>day,<span class="dt">y=</span>median),<span class="dt">colour=</span><span class="st">&quot;red&quot;</span>)<span class="op">+</span></a>
+<a class="sourceLine" id="cb28-7" title="7"><span class="st">  </span><span class="kw">geom_ribbon</span>(<span class="kw">aes</span>(<span class="dt">x=</span>day,<span class="dt">ymin=</span>ici,<span class="dt">ymax=</span>sci),<span class="dt">alpha =</span> <span class="fl">0.5</span>)<span class="op">+</span></a>
+<a class="sourceLine" id="cb28-8" title="8"><span class="st">              </span><span class="kw">theme</span>(<span class="dt">axis.text.x =</span> <span class="kw">element_text</span>(<span class="dt">angle =</span> <span class="dv">90</span>,<span class="dt">size=</span><span class="kw">rel</span>(<span class="fl">0.8</span>)))</a>
+<a class="sourceLine" id="cb28-9" title="9">pmax</a></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-3-1.svg" width="672" /></p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" title="1"><span class="kw">pdf</span>(<span class="dt">file=</span><span class="st">&quot;../sort/fig/bayes-preds-spain1.pdf&quot;</span>)</a>
+<a class="sourceLine" id="cb29-2" title="2">pmax</a>
+<a class="sourceLine" id="cb29-3" title="3"><span class="kw">dev.off</span>()</a></code></pre></div>
+<pre><code>## svg 
+##   2</code></pre>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" title="1"><span class="kw">datatable</span>(toplot[<span class="kw">is.na</span>(toplot<span class="op">$</span>observed),],<span class="dt">rownames =</span> <span class="ot">NULL</span>)</a></code></pre></div>
+<div id="htmlwidget-78e637c0a0b9c3d365c5" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-78e637c0a0b9c3d365c5">{"x":{"filter":"none","data":[["2021-02-19","2021-02-20","2021-02-21","2021-02-22","2021-02-23","2021-02-24"],[2,3,4,5,6,7],[null,null,null,null,null,null],[164,150,137,128,118,109],[231,222,213,201,197,193],[317,312,308,309,308,315]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>day<\/th>\n      <th>delay<\/th>\n      <th>observed<\/th>\n      <th>ici<\/th>\n      <th>median<\/th>\n      <th>sci<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[1,2,3,4,5]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="bayesian-model.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="what-if-scenarios-and-predictions.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
