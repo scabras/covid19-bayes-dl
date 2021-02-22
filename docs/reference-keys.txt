@@ -1,0 +1,11 @@
+data-preparation
+model
+lstm-estimation
+model-train
+bayesian-model
+results-on-available-data
+incidence-by-region
+incidence-for-spain
+what-if-scenarios-and-predictions
+scenario-1.
+scenario-2.
