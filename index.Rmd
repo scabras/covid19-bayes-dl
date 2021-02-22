@@ -10,9 +10,7 @@ output:
 
 ```{r setup, include=FALSE}
 rm(list=ls())
-#setwd("/Documents and Settings/scabr/gd/Articulos/elvirusdelacorona/covid19-bayes-dl/")
 setwd("~/gd/Articulos/elvirusdelacorona/covid19-bayes-dl/")
-options(bitmapType='cairo')
 knitr::opts_chunk$set(echo = TRUE,warning = FALSE)
 library(reticulate)
 library(reshape2)
