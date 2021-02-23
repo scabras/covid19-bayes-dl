@@ -173,7 +173,7 @@ p1=ggplot(subset(allres,(delay%in%c(0,1))),
           aes(x=day,y=cases,color=type))+facet_wrap(. ~ region)+geom_line()+
   theme(axis.text.x = element_text(angle = 90,size=rel(0.8)))
 
-pmax=ggplot(subset(allres,(delay%in%c(0,max_delay))&(day>as.Date("2021-01-01"))),aes(x=day,y=cases,color=type))+
+pmax=ggplot(subset(allres,day>as.Date("2021-01-01")),aes(x=day,y=cases,color=type))+
   facet_wrap(. ~ region)+geom_line()+
   theme(axis.text.x = element_text(angle = 90,size=rel(0.8)))
 
