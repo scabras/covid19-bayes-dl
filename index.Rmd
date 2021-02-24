@@ -49,11 +49,11 @@ for(j in 2:ncol(cvirus.ccaa.fat)){
 }
 
 cvirus=cvirus.ccaa.fat
-
+last.observed=max(cvirus$day)
 dim(cvirus)
 ```
 
-We have `r nrow(cvirus)` days (in the range `r range(cvirus$day)`)  and `r ncol(cvirus)` variables which represent the cumulative incidence at 14 days per 100000 people along the regions.
+We have `r nrow(cvirus)` days (since 2020-01-01 till `r last.observed`)  and `r ncol(cvirus)` variables which represent the cumulative incidence at 14 days per 100000 people along the regions.
 
 
 These are daily cumulative 14 days incidence :
@@ -146,7 +146,8 @@ collect.lstmoutout=function(datobs,testset=FALSE){
 Here we estimate twice the model: the first for evaluating performance on test set and the second for the final analysis.
 
 ```{r lstmtraintest}
-est.lstm(cvirus,test.from="2021-01-01") # Model evaluation on Test set
+
+est.lstm(cvirus,test.from=last.observed-max_delay) # Model evaluation on Test set
 tt=collect.lstmoutout(cvirus,testset = TRUE)
 allres.test=tt[[2]]
 allerror.test=tt[[3]]
@@ -221,7 +222,7 @@ The Negative Binomial Bayesian Model predictive posterior is calculated here.
 
 
 ```{r negbin}
-bayes.pred=function(allres.bayes){
+bayes.pred=function(allres.bayes,no.obs=FALSE){
   preds=melt(data.frame(allres.bayes[,1:21]),
              id.vars = c("day","delay"),value.name = "cases",
              variable.name = "region")
@@ -231,7 +232,7 @@ bayes.pred=function(allres.bayes){
   lstm.var=data.frame(error=(preds$cases-obs$cases)^2,delay=preds$delay,region=preds$region)
   lstm.var=aggregate(lstm.var$error,by = list(delay=lstm.var$delay,region=lstm.var$region),mean,na.rm=TRUE)
   prior.var=apply(preds[c("delay","region")],1,function(x) lstm.var$x[(lstm.var$delay==x[1])&(lstm.var$region==x[2])])
-  ii=is.na(obs$cases)
+  ii=is.na(obs$cases)|no.obs
   a=preds$cases^2/prior.var # Prior Gamma a parameter
   b=preds$cases/prior.var # Prior Gamma b parameter
   p=(b+1)/(b+2) # Predictive posterior p parameter
@@ -239,7 +240,7 @@ bayes.pred=function(allres.bayes){
   oo=obs$cases
   oo[ii]=0
   size=a+oo # Predictive posterior size parameter
-  post.pred.summary=t(apply(cbind(size,p),1,function(x) qnbinom(c(0.025,0.5,0.975),size=x[1],prob=x[2])))
+  post.pred.summary=t(apply(cbind(size,p),1,function(x) qnbinom(c(0.005,0.5,0.995),size=x[1],prob=x[2])))
   colnames(post.pred.summary)=c("ici","median","sci")
   final.res=data.frame(day=preds$day,delay=preds$delay,
                        region=preds$region,
@@ -305,11 +306,11 @@ datatable(toplot[is.na(toplot$observed),],rownames = NULL)
 
 ## Evaluation on the test set
 
-If the model where trained on only 2020, this the output for year 2021.
+If the model where trained upto `r last.observed-max_delay` these are the Bayesian predictions
 
 ```{r testsetoutput}
-final.res.test=bayes.pred(allres.bayes.test)
-toplot=subset(final.res.test,(day>as.Date("2021-01-01"))&(day<max(cvirus$day)))
+final.res.test=bayes.pred(allres.bayes.test,no.obs = TRUE)
+toplot=subset(final.res.test,(day>last.observed-max_delay)&(day<last.observed))
 pmax=ggplot(toplot,aes(x=day,y=observed))+geom_line()+
   geom_line(aes(x=day,y=median),colour="red")+
   geom_ribbon(aes(x=day,ymin=ici,ymax=sci),alpha = 0.5)+
