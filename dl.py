@@ -19,11 +19,11 @@ OUT_STEPS = LABEL_WIDTH = 7  # Days of predictions
 
 # Read data
 df = pd.read_csv("dlio/civinput.csv")
+dftest = pd.read_csv("dlio/civinput-test.csv")
 column_indices = {name: i for i, name in enumerate(df.columns)}
-n = len(df)
-train_df = df[0:n]
-val_df = df[0:n]
-test_df = df[0:n]
+train_df = df
+val_df = df
+test_df = dftest
 num_features = df.shape[1]
 train_mean = train_df.mean()
 train_std = train_df.std()
@@ -208,11 +208,13 @@ def call(self, inputs, training=None):
 
 FeedBack.call = call
 
-pastdays = tf.keras.preprocessing.timeseries_dataset_from_array(multi_window.test_df,targets=None,sequence_length=multi_window.total_window_size)
+pastdaystrain = tf.keras.preprocessing.timeseries_dataset_from_array(multi_window.train_df,targets=None,sequence_length=multi_window.total_window_size)
+pastdaystest = tf.keras.preprocessing.timeseries_dataset_from_array(multi_window.test_df,targets=None,sequence_length=multi_window.total_window_size)
 
 ## AUTOREGRESSIVE PREDICTIONS THIS IS USED IN THE PAPER
 history = compile_and_fit(feedback_model, multi_window)
-predays = feedback_model.predict(pastdays)
+predaystrain = feedback_model.predict(pastdaystrain)
+predaystest = feedback_model.predict(pastdaystest)
 
 ## ONE STEP PREDICTIONS THIS IS NOT USED IN THE PAPER BUT IT MAY BE USEFUL
 #history = compile_and_fit(mymodel, multi_window)
@@ -221,15 +223,20 @@ predays = feedback_model.predict(pastdays)
 pd.DataFrame(history.history).to_csv('dlio/history.csv')
 
 
-for region in range(predays.shape[2]):
-  predays[:, :, region] = train_mean[region] + predays[:, :, region]*train_std[region]
+for region in range(predaystest.shape[2]):
+  predaystrain[:, :, region] = train_mean[region] + predaystrain[:, :, region]*train_std[region]
+  predaystest[:, :, region] = train_mean[region] + predaystest[:, :, region]*train_std[region]
 
 
-for i in range(predays.shape[0]):
-    for j in range(predays.shape[1]):
-        for k in range(predays.shape[2]):
-            predays[i, j, k] = round(predays[i, j, k])
+for i in range(predaystrain.shape[0]):
+    for j in range(predaystrain.shape[1]):
+        for k in range(predaystrain.shape[2]):
+            predaystrain[i, j, k] = round(predaystrain[i, j, k])
 
+for i in range(predaystest.shape[0]):
+    for j in range(predaystest.shape[1]):
+        for k in range(predaystest.shape[2]):
+            predaystest[i, j, k] = round(predaystest[i, j, k])
 
 # pred=predays[:,6,13]
 # obs=df["MD"][df.shape[0]-pred.shape[0]:df.shape[0]]
@@ -243,6 +250,8 @@ for i in range(predays.shape[0]):
 # plt.plot(obs, pred, 'o', color='black');
 # plt.show()
 
-for i in range(predays.shape[1]):
-  pd.DataFrame(predays[:,i,:],columns=df.columns).to_csv('dlio/civout'+str(i+1)+'.csv')
+for i in range(predaystrain.shape[1]):
+  pd.DataFrame(predaystrain[:,i,:],columns=df.columns).to_csv('dlio/civout'+str(i+1)+'.csv')
 
+for i in range(predaystest.shape[1]):
+  pd.DataFrame(predaystest[:,i,:],columns=df.columns).to_csv('dlio/civout-test'+str(i+1)+'.csv')
