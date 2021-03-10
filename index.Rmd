@@ -65,9 +65,9 @@ p=ggplot(meltdat, aes(x =day, y = Incidence,color=region))+
   geom_line()+
   theme(axis.text.x = element_text(angle = 90,size=rel(0.8)))
 p
-pdf(file="../sort/fig/obsinc.pdf")
-print(p)
-dev.off()
+#pdf(file="../sort/fig/obsinc.pdf")
+#print(p)
+#dev.off()
 ```
 
 
@@ -170,9 +170,9 @@ p=ggplot(history,aes(x=1:nrow(history),y=val_loss))+
   ylab("Mean Squared Error (Incidence)")
 p
 
-pdf(file="../sort/fig/history.pdf")
-p
-dev.off()
+#pdf(file="../sort/fig/history.pdf")
+#p
+#dev.off()
 ```
 
 
@@ -183,9 +183,9 @@ These are the errors depending on how many days before was made the prediction (
 p=ggplot(allerror,aes(x=factor(delay),y=error))+
   facet_wrap(. ~ region)+geom_violin()+ ylab("Incidence")
 p
-pdf(file="../sort/fig/errors.pdf")
-p
-dev.off()
+#pdf(file="../sort/fig/errors.pdf")
+#p
+#dev.off()
 ```
 
 These are the LSTM predictions (prior means):
@@ -202,13 +202,13 @@ pmax=ggplot(subset(allres,day>as.Date("2021-01-01")),aes(x=day,y=cases,color=typ
 p1
 pmax
 
-pdf(file="../sort/fig/preds1.pdf")
-p1
-dev.off()
+#pdf(file="../sort/fig/preds1.pdf")
+#p1
+#dev.off()
 
-pdf(file="../sort/fig/predsmax.pdf")
-pmax
-dev.off()
+#pdf(file="../sort/fig/predsmax.pdf")
+#pmax
+#dev.off()
 ```
 
 Such output contains a guess of the process filtration $\mathcal{F_{t-1}}$ in $P$.
@@ -272,9 +272,9 @@ pmax=ggplot(toplot,aes(x=day,y=observed))+geom_line()+
               theme(axis.text.x = element_text(angle = 90,size=rel(0.8)))+ ylab("Incidence")
 pmax
 
-pdf(file="../sort/fig/bayes-preds1.pdf")
-pmax
-dev.off()
+#pdf(file="../sort/fig/bayes-preds1.pdf")
+#pmax
+#dev.off()
 
 
 datatable(toplot[is.na(toplot$observed),],rownames = NULL)
@@ -295,9 +295,9 @@ pmax=ggplot(toplot,aes(x=day,y=observed))+geom_line()+
               theme(axis.text.x = element_text(angle = 90,size=rel(0.8)))+ ylab("Incidence")
 pmax
 
-pdf(file="../sort/fig/bayes-preds-spain1.pdf")
-pmax
-dev.off()
+#pdf(file="../sort/fig/bayes-preds-spain1.pdf")
+#pmax
+#dev.off()
 
 
 datatable(toplot[is.na(toplot$observed),],rownames = NULL)
@@ -318,9 +318,9 @@ pmax=ggplot(toplot,aes(x=day,y=observed))+geom_line()+
               theme(axis.text.x = element_text(angle = 90,size=rel(0.8)))+ ylab("Incidence")
 pmax
 
-pdf(file="../sort/fig/bayes-predsmaxtest.pdf")
-pmax
-dev.off()
+#pdf(file="../sort/fig/bayes-predsmaxtest.pdf")
+#pmax
+#dev.off()
 ```
 
 
@@ -352,9 +352,9 @@ pmax=ggplot(toplot,aes(x=day,y=median))+geom_line(colour="red")+
 pmax
 
 
-pdf(file="../sort/fig/sc1.pdf")
-print(pmax)
-dev.off()
+#pdf(file="../sort/fig/sc1.pdf")
+#print(pmax)
+#dev.off()
 ```
 
 
@@ -379,7 +379,7 @@ pmax=ggplot(toplot,aes(x=day,y=median))+geom_line(colour="red")+
 
 pmax
 
-pdf(file="../sort/fig/sc2.pdf")
-print(pmax)
-dev.off()
+#pdf(file="../sort/fig/sc2.pdf")
+#print(pmax)
+#dev.off()
 ```
