@@ -14,8 +14,8 @@ import seaborn as sns
 import tensorflow as tf
 
 MAX_EPOCHS = 50
-INPUT_WIDTH = 7*2 # Days of input in each batch
-OUT_STEPS = LABEL_WIDTH = 7  # Days of predictions
+INPUT_WIDTH = 7*3 # Days of input in each batch
+OUT_STEPS = LABEL_WIDTH = 7 # Days of predictions
 
 # Read data
 df = pd.read_csv("dlio/civinput.csv")

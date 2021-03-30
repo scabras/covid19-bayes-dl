@@ -146,7 +146,6 @@ collect.lstmoutout=function(datobs,testset=FALSE){
 Here we estimate twice the model: the first for evaluating performance on test set and the second for the final analysis.
 
 ```{r lstmtraintest}
-
 est.lstm(cvirus,test.from=last.observed-max_delay) # Model evaluation on Test set
 tt=collect.lstmoutout(cvirus,testset = TRUE)
 allres.test=tt[[2]]
@@ -231,7 +230,7 @@ bayes.pred=function(allres.bayes,no.obs=FALSE){
   
   lstm.var=data.frame(error=(preds$cases-obs$cases)^2,delay=preds$delay,region=preds$region)
   lstm.var=aggregate(lstm.var$error,by = list(delay=lstm.var$delay,region=lstm.var$region),mean,na.rm=TRUE)
-  prior.var=apply(preds[c("delay","region")],1,function(x) lstm.var$x[(lstm.var$delay==x[1])&(lstm.var$region==x[2])])
+  prior.var=merge(preds,lstm.var)$x
   ii=is.na(obs$cases)|no.obs
   a=preds$cases^2/prior.var # Prior Gamma a parameter
   b=preds$cases/prior.var # Prior Gamma b parameter
