@@ -230,7 +230,7 @@ bayes.pred=function(allres.bayes,no.obs=FALSE){
   
   lstm.var=data.frame(error=(preds$cases-obs$cases)^2,delay=preds$delay,region=preds$region)
   lstm.var=aggregate(lstm.var$error,by = list(delay=lstm.var$delay,region=lstm.var$region),mean,na.rm=TRUE)
-  prior.var=merge(preds,lstm.var)$x
+  prior.var=apply(preds[,2:3],1,function(xx) lstm.var$x[(lstm.var$delay==as.numeric(xx[1]))&(lstm.var$region==as.character(xx[2]))])
   ii=is.na(obs$cases)|no.obs
   a=preds$cases^2/prior.var # Prior Gamma a parameter
   b=preds$cases/prior.var # Prior Gamma b parameter
