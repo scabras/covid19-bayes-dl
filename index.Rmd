@@ -65,9 +65,9 @@ p=ggplot(meltdat, aes(x =day, y = Incidence,color=region))+
   geom_line()+
   theme(axis.text.x = element_text(angle = 90,size=rel(0.8)))
 p
-#pdf(file="../sort/fig/obsinc.pdf")
-#print(p)
-#dev.off()
+pdf(file="../jas/obsinc.pdf")
+print(p)
+dev.off()
 ```
 
 
@@ -169,9 +169,9 @@ p=ggplot(history,aes(x=1:nrow(history),y=val_loss))+
   ylab("Mean Squared Error (Incidence)")
 p
 
-#pdf(file="../sort/fig/history.pdf")
-#p
-#dev.off()
+pdf(file="../jas/history.pdf")
+p
+dev.off()
 ```
 
 
@@ -182,9 +182,9 @@ These are the errors depending on how many days before was made the prediction (
 p=ggplot(allerror,aes(x=factor(delay),y=error))+
   facet_wrap(. ~ region)+geom_violin()+ ylab("Incidence")
 p
-#pdf(file="../sort/fig/errors.pdf")
-#p
-#dev.off()
+pdf(file="../jas/errors.pdf")
+p
+dev.off()
 ```
 
 These are the LSTM predictions (prior means):
@@ -201,13 +201,13 @@ pmax=ggplot(subset(allres,day>as.Date("2021-01-01")),aes(x=day,y=cases,color=typ
 p1
 pmax
 
-#pdf(file="../sort/fig/preds1.pdf")
-#p1
-#dev.off()
+pdf(file="../jas/preds1.pdf")
+p1
+dev.off()
 
-#pdf(file="../sort/fig/predsmax.pdf")
-#pmax
-#dev.off()
+pdf(file="../jas/predsmax.pdf")
+pmax
+dev.off()
 ```
 
 Such output contains a guess of the process filtration $\mathcal{F_{t-1}}$ in $P$.
@@ -271,9 +271,9 @@ pmax=ggplot(toplot,aes(x=day,y=observed))+geom_line()+
               theme(axis.text.x = element_text(angle = 90,size=rel(0.8)))+ ylab("Incidence")
 pmax
 
-#pdf(file="../sort/fig/bayes-preds1.pdf")
-#pmax
-#dev.off()
+pdf(file="../jas/bayes-preds1.pdf")
+pmax
+dev.off()
 
 
 datatable(toplot[is.na(toplot$observed),],rownames = NULL)
@@ -294,9 +294,9 @@ pmax=ggplot(toplot,aes(x=day,y=observed))+geom_line()+
               theme(axis.text.x = element_text(angle = 90,size=rel(0.8)))+ ylab("Incidence")
 pmax
 
-#pdf(file="../sort/fig/bayes-preds-spain1.pdf")
-#pmax
-#dev.off()
+pdf(file="../jas/bayes-preds-spain1.pdf")
+pmax
+dev.off()
 
 
 datatable(toplot[is.na(toplot$observed),],rownames = NULL)
@@ -317,9 +317,9 @@ pmax=ggplot(toplot,aes(x=day,y=observed))+geom_line()+
               theme(axis.text.x = element_text(angle = 90,size=rel(0.8)))+ ylab("Incidence")
 pmax
 
-#pdf(file="../sort/fig/bayes-predsmaxtest.pdf")
-#pmax
-#dev.off()
+pdf(file="../jas/bayes-predsmaxtest.pdf")
+pmax
+dev.off()
 ```
 
 
@@ -335,7 +335,7 @@ Suppose that the last 10 days incidence in the Madrid region was incremented by 
 ```{r sc1preds}
 last.days=(nrow(cvirus)-20):nrow(cvirus)
 datsc1=cvirus
-datsc1$MD[last.days]=datsc1$MD[min(last.days)]*(1.05)^((0:9))
+datsc1$MD[last.days]=datsc1$MD[min(last.days)]*(1.1)^((0:9))
 est.lstm(datsc1)
 tt1=collect.lstmoutout(datsc1)
 allres.bayes1=tt1[[1]]
@@ -345,15 +345,15 @@ toplot=subset(final.res1,day>min(cvirus$day[last.days]))
 
 pmax=ggplot(toplot,aes(x=day,y=median))+geom_line(colour="red")+
   geom_ribbon(aes(x=day,ymin=ici,ymax=sci),alpha = 0.5)+
-  facet_wrap(. ~ region)+ylim(c(0,4))+
+  facet_wrap(. ~ region)+ylim(c(0,2))+
   theme(axis.text.x = element_text(angle = 90,size=rel(0.8)))+ ylab("Ratio of predicted incidence (scenario vs actual)")
 
 pmax
 
 
-#pdf(file="../sort/fig/sc1.pdf")
-#print(pmax)
-#dev.off()
+pdf(file="../jas/sc1.pdf")
+print(pmax)
+dev.off()
 ```
 
 
@@ -373,12 +373,12 @@ toplot=subset(final.res2,day>as.Date("2021-01-01"))
 
 pmax=ggplot(toplot,aes(x=day,y=median))+geom_line(colour="red")+
   geom_ribbon(aes(x=day,ymin=ici,ymax=sci),alpha = 0.5)+
-  facet_wrap(. ~ region)+ylim(c(0,4))+
+  facet_wrap(. ~ region)+ylim(c(0,2))+
   theme(axis.text.x = element_text(angle = 90,size=rel(0.8)))+ ylab("Ratio of predicted incidence (scenario vs actual)")
 
 pmax
 
-#pdf(file="../sort/fig/sc2.pdf")
-#print(pmax)
-#dev.off()
+pdf(file="../jas/sc2.pdf")
+print(pmax)
+dev.off()
 ```
