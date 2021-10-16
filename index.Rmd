@@ -112,7 +112,6 @@ est.lstm=function(dat,test.from=max(cvirus$day)+1){
 All observations aftert `test.from` are for test and not for train.
 
 ```{r collectlstmoutput}
-max_delay=length(list.files(path = "dlio",pattern = "civout-test"))
 collect.lstmoutout=function(datobs,testset=FALSE){
   allres=allerror=allres.bayes=NULL
   for(i in 1:max_delay){
@@ -146,7 +145,9 @@ collect.lstmoutout=function(datobs,testset=FALSE){
 Here we estimate twice the model: the first for evaluating performance on test set and the second for the final analysis.
 
 ```{r lstmtraintest}
+max_delay=length(list.files(path = "dlio",pattern = "civout-test"))
 est.lstm(cvirus,test.from=last.observed-max_delay) # Model evaluation on Test set
+max_delay=7
 tt=collect.lstmoutout(cvirus,testset = TRUE)
 allres.test=tt[[2]]
 allerror.test=tt[[3]]
