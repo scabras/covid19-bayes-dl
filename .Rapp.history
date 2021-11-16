@@ -1,0 +1,939 @@
+q()
+rm(list=ls())#
+library(reshape2)#
+setwd("/Users/scabras74/gd/Articulos/elvirusdelacorona/covid19-bayes-dl/")#
+ccaa.lab=c("AN", "AR", "AS", "CB", "CE", "CL", "CM", "CN", "CT", #
+           "EX", "GA","IB", "MC", "MD", "ML", "NC","PV", "RI", "VC")#
+cvirus.ccaa=read.table("https://cnecovid.isciii.es/covid19/resources/casos_diag_ccaadecl.csv", #
+                          sep = ",", header = T)#
+maxr=max(which(cvirus.ccaa$fecha==max(cvirus.ccaa$fecha)))#
+cvirus.ccaa$ccaa_iso=factor(cvirus.ccaa$ccaa_iso)#
+cvirus.ccaa=data.frame(region=cvirus.ccaa$ccaa_iso,#
+                  day=as.Date(as.character(cvirus.ccaa$fecha),#
+                              format="%Y-%m-%d"),#
+                  cases=cvirus.ccaa$num_casos)#
+pop=read.table("demcca.csv",header = TRUE,sep=";")#
+pop=data.frame(region=pop$CCAA,pop=pop$pob)[1:19,]#
+pop=pop[order(pop$region),]#
+pop$w=pop$pop/sum(pop$pop)#
+cvirus.ccaa.fat=dcast(cvirus.ccaa,formula = day~region,value.var = "cases")#
+for(j in 2:ncol(cvirus.ccaa.fat)){#
+  y=cvirus.ccaa.fat[,j]#
+  y=c(rep(0,13),y)#
+  y=cumsum(y)#
+  y=y[14:length(y)]-y[1+(0:(length(y)-14))]#
+  cvirus.ccaa.fat[,j]=as.integer((y/pop$pop[pop$region==colnames(cvirus.ccaa.fat)[j]])*100000)#
+}#
+#
+cvirus=cvirus.ccaa.fat#
+last.observed=max(cvirus$day)#
+dim(cvirus)#
+#
+dp=cvirus$day[-1]#
+y=log(1+as.matrix(cvirus[,-1]))#
+yl1=y[-nrow(y),]#
+y=y[-1,]#
+start=3#
+rr=array(NA,dim=dim(y))#
+ndaysahead=1#
+for(i in start:nrow(y)){#
+	mymod=lm(as.matrix(y[1:(i-1),])~as.matrix(yl1[1:(i-1),]))#
+	pred=round(exp(predict(mymod,newobs=yl1[1:(i-1+ ndaysahead),])),0)#
+	rr[i+ ndaysahead,]=pred[nrow(pred),]#
+}#
+preds=data.frame(day=dp,rr)#
+colnames(preds)=colnames(cvirus)#
+obs=cvirus[-nrow(cvirus),]#
+errors=data.frame(obs[,-1]-preds[,-1])#
+diag(cor(obs[,-1],preds[,-1],use="complete.obs")^2)#
+preds$type="preds"#
+obs$type="obs"#
+errors$day=dp#
+errors$type="error"#
+dd=rbind(preds,obs)#
+#
+dd=melt(dd,value.name="incidence",variable.name="region",id.vars=c("day","type"))#
+#
+library(ggplot2)#
+#ggplot(dd,aes(x=day,y=incidence,col=type))+facet_wrap(. ~ region)+#
+#geom_line()+#
+#theme(axis.text.x = element_text(angle = 90,size=rel(0.8)))#
+#
+error=melt(errors,value.name="error",variable.name="region",id.vars=c("day"))#
+#
+ggplot(error,aes(x=region,y=error))+geom_violin()
+str(error)
+error=melt(errors,value.name="error",variable.name="region",id.vars=c("day"))#
+error$error=as.numeric(error$error)#
+ggplot(error,aes(x=region,y=error))+geom_violin()
+rm(list=ls())#
+library(reshape2)#
+setwd("/Users/scabras74/gd/Articulos/elvirusdelacorona/covid19-bayes-dl/")#
+ccaa.lab=c("AN", "AR", "AS", "CB", "CE", "CL", "CM", "CN", "CT", #
+           "EX", "GA","IB", "MC", "MD", "ML", "NC","PV", "RI", "VC")#
+cvirus.ccaa=read.table("https://cnecovid.isciii.es/covid19/resources/casos_diag_ccaadecl.csv", #
+                          sep = ",", header = T)#
+maxr=max(which(cvirus.ccaa$fecha==max(cvirus.ccaa$fecha)))#
+cvirus.ccaa$ccaa_iso=factor(cvirus.ccaa$ccaa_iso)#
+cvirus.ccaa=data.frame(region=cvirus.ccaa$ccaa_iso,#
+                  day=as.Date(as.character(cvirus.ccaa$fecha),#
+                              format="%Y-%m-%d"),#
+                  cases=cvirus.ccaa$num_casos)#
+pop=read.table("demcca.csv",header = TRUE,sep=";")#
+pop=data.frame(region=pop$CCAA,pop=pop$pob)[1:19,]#
+pop=pop[order(pop$region),]#
+pop$w=pop$pop/sum(pop$pop)#
+cvirus.ccaa.fat=dcast(cvirus.ccaa,formula = day~region,value.var = "cases")#
+for(j in 2:ncol(cvirus.ccaa.fat)){#
+  y=cvirus.ccaa.fat[,j]#
+  y=c(rep(0,13),y)#
+  y=cumsum(y)#
+  y=y[14:length(y)]-y[1+(0:(length(y)-14))]#
+  cvirus.ccaa.fat[,j]=as.integer((y/pop$pop[pop$region==colnames(cvirus.ccaa.fat)[j]])*100000)#
+}#
+#
+cvirus=cvirus.ccaa.fat#
+last.observed=max(cvirus$day)#
+dim(cvirus)#
+#
+dp=cvirus$day[-1]#
+y=log(1+as.matrix(cvirus[,-1]))#
+yl1=y[-nrow(y),]#
+y=y[-1,]#
+start=3#
+rr=array(NA,dim=dim(y))#
+ndaysahead=1#
+for(i in start:nrow(y)){#
+	mymod=lm(as.matrix(y[1:(i-1),])~as.matrix(yl1[1:(i-1),]))#
+	pred=round(exp(predict(mymod,newobs=yl1[1:(i-1+ ndaysahead),])),0)#
+	rr[i+ ndaysahead,]=pred[nrow(pred),]#
+}#
+preds=data.frame(day=dp,rr)#
+colnames(preds)=colnames(cvirus)#
+obs=cvirus[-nrow(cvirus),]#
+errors=data.frame(obs[,-1]-preds[,-1])#
+diag(cor(obs[,-1],preds[,-1],use="complete.obs")^2)#
+preds$type="preds"#
+obs$type="obs"#
+errors$day=dp#
+dd=rbind(preds,obs)#
+#
+dd=melt(dd,value.name="incidence",variable.name="region",id.vars=c("day","type"))#
+#
+library(ggplot2)#
+#ggplot(dd,aes(x=day,y=incidence,col=type))+facet_wrap(. ~ region)+#
+#geom_line()+#
+#theme(axis.text.x = element_text(angle = 90,size=rel(0.8)))#
+#
+error=melt(errors,value.name="error",variable.name="region",id.vars=c("day"))#
+error$error=as.numeric(error$error)#
+ggplot(error,aes(x=region,y=error))+geom_violin()
+rm(list=ls())#
+library(reshape2)#
+setwd("/Users/scabras74/gd/Articulos/elvirusdelacorona/covid19-bayes-dl/")#
+ccaa.lab=c("AN", "AR", "AS", "CB", "CE", "CL", "CM", "CN", "CT", #
+           "EX", "GA","IB", "MC", "MD", "ML", "NC","PV", "RI", "VC")#
+cvirus.ccaa=read.table("https://cnecovid.isciii.es/covid19/resources/casos_diag_ccaadecl.csv", #
+                          sep = ",", header = T)#
+maxr=max(which(cvirus.ccaa$fecha==max(cvirus.ccaa$fecha)))#
+cvirus.ccaa$ccaa_iso=factor(cvirus.ccaa$ccaa_iso)#
+cvirus.ccaa=data.frame(region=cvirus.ccaa$ccaa_iso,#
+                  day=as.Date(as.character(cvirus.ccaa$fecha),#
+                              format="%Y-%m-%d"),#
+                  cases=cvirus.ccaa$num_casos)#
+pop=read.table("demcca.csv",header = TRUE,sep=";")#
+pop=data.frame(region=pop$CCAA,pop=pop$pob)[1:19,]#
+pop=pop[order(pop$region),]#
+pop$w=pop$pop/sum(pop$pop)#
+cvirus.ccaa.fat=dcast(cvirus.ccaa,formula = day~region,value.var = "cases")#
+for(j in 2:ncol(cvirus.ccaa.fat)){#
+  y=cvirus.ccaa.fat[,j]#
+  y=c(rep(0,13),y)#
+  y=cumsum(y)#
+  y=y[14:length(y)]-y[1+(0:(length(y)-14))]#
+  cvirus.ccaa.fat[,j]=as.integer((y/pop$pop[pop$region==colnames(cvirus.ccaa.fat)[j]])*100000)#
+}#
+#
+cvirus=cvirus.ccaa.fat#
+last.observed=max(cvirus$day)#
+dim(cvirus)#
+#
+dp=cvirus$day[-1]#
+y=log(1+as.matrix(cvirus[,-1]))#
+yl1=y[-nrow(y),]#
+y=y[-1,]#
+start=7#
+rr=array(NA,dim=dim(y))#
+ndaysahead=1#
+for(i in start:nrow(y)){#
+	mymod=lm(as.matrix(y[1:(i-1),])~as.matrix(yl1[1:(i-1),]))#
+	pred=round(exp(predict(mymod,newobs=yl1[1:(i-1+ ndaysahead),])),0)#
+	rr[i+ ndaysahead,]=pred[nrow(pred),]#
+}#
+preds=data.frame(day=dp,rr)#
+colnames(preds)=colnames(cvirus)#
+obs=cvirus[-nrow(cvirus),]#
+errors=data.frame(obs[,-1]-preds[,-1])#
+diag(cor(obs[,-1],preds[,-1],use="complete.obs")^2)#
+preds$type="preds"#
+obs$type="obs"#
+errors$day=dp#
+dd=rbind(preds,obs)#
+#
+dd=melt(dd,value.name="incidence",variable.name="region",id.vars=c("day","type"))#
+#
+library(ggplot2)#
+#ggplot(dd,aes(x=day,y=incidence,col=type))+facet_wrap(. ~ region)+#
+#geom_line()+#
+#theme(axis.text.x = element_text(angle = 90,size=rel(0.8)))#
+#
+error=melt(errors,value.name="error",variable.name="region",id.vars=c("day"))#
+error$error=as.numeric(error$error)#
+ggplot(error,aes(x=region,y=error))+geom_violin()
+rm(list=ls())#
+library(reshape2)#
+setwd("/Users/scabras74/gd/Articulos/elvirusdelacorona/covid19-bayes-dl/")#
+ccaa.lab=c("AN", "AR", "AS", "CB", "CE", "CL", "CM", "CN", "CT", #
+           "EX", "GA","IB", "MC", "MD", "ML", "NC","PV", "RI", "VC")#
+cvirus.ccaa=read.table("https://cnecovid.isciii.es/covid19/resources/casos_diag_ccaadecl.csv", #
+                          sep = ",", header = T)#
+maxr=max(which(cvirus.ccaa$fecha==max(cvirus.ccaa$fecha)))#
+cvirus.ccaa$ccaa_iso=factor(cvirus.ccaa$ccaa_iso)#
+cvirus.ccaa=data.frame(region=cvirus.ccaa$ccaa_iso,#
+                  day=as.Date(as.character(cvirus.ccaa$fecha),#
+                              format="%Y-%m-%d"),#
+                  cases=cvirus.ccaa$num_casos)#
+pop=read.table("demcca.csv",header = TRUE,sep=";")#
+pop=data.frame(region=pop$CCAA,pop=pop$pob)[1:19,]#
+pop=pop[order(pop$region),]#
+pop$w=pop$pop/sum(pop$pop)#
+cvirus.ccaa.fat=dcast(cvirus.ccaa,formula = day~region,value.var = "cases")#
+for(j in 2:ncol(cvirus.ccaa.fat)){#
+  y=cvirus.ccaa.fat[,j]#
+  y=c(rep(0,13),y)#
+  y=cumsum(y)#
+  y=y[14:length(y)]-y[1+(0:(length(y)-14))]#
+  cvirus.ccaa.fat[,j]=as.integer((y/pop$pop[pop$region==colnames(cvirus.ccaa.fat)[j]])*100000)#
+}#
+#
+cvirus=cvirus.ccaa.fat#
+last.observed=max(cvirus$day)#
+dim(cvirus)#
+#
+dp=cvirus$day[-1]#
+y=log(1+as.matrix(cvirus[,-1]))#
+yl1=y[-nrow(y),]#
+y=y[-1,]#
+start=7#
+rr=array(NA,dim=dim(y))#
+ndaysahead=1#
+for(i in start:nrow(y)){#
+	mymod=lm(as.matrix(y[1:(i-1),])~as.matrix(yl1[1:(i-1),]))#
+	pred=round(exp(predict(mymod,newobs=yl1[1:(i-1+ ndaysahead),])),0)#
+	rr[i+ ndaysahead,]=pred[nrow(pred),]#
+}#
+preds=data.frame(day=dp,rr)#
+colnames(preds)=colnames(cvirus)#
+obs=cvirus[-nrow(cvirus),]#
+errors=data.frame(obs[,-1]-preds[,-1])#
+diag(cor(obs[,-1],preds[,-1],use="complete.obs")^2)#
+preds$type="preds"#
+obs$type="obs"#
+errors$day=dp#
+dd=rbind(preds,obs)#
+#
+dd=melt(dd,value.name="incidence",variable.name="region",id.vars=c("day","type"))#
+#
+library(ggplot2)#
+#ggplot(dd,aes(x=day,y=incidence,col=type))+facet_wrap(. ~ region)+#
+#geom_line()+#
+#theme(axis.text.x = element_text(angle = 90,size=rel(0.8)))#
+#
+error=melt(errors,value.name="error",variable.name="region",id.vars=c("day"))#
+error$error=as.numeric(error$error)#
+ggplot(error,aes(x=region,y=error))+geom_violin()
+rm(list=ls())#
+library(reshape2)#
+setwd("/Users/scabras74/gd/Articulos/elvirusdelacorona/covid19-bayes-dl/")#
+ccaa.lab=c("AN", "AR", "AS", "CB", "CE", "CL", "CM", "CN", "CT", #
+           "EX", "GA","IB", "MC", "MD", "ML", "NC","PV", "RI", "VC")#
+cvirus.ccaa=read.table("https://cnecovid.isciii.es/covid19/resources/casos_diag_ccaadecl.csv", #
+                          sep = ",", header = T)#
+maxr=max(which(cvirus.ccaa$fecha==max(cvirus.ccaa$fecha)))#
+cvirus.ccaa$ccaa_iso=factor(cvirus.ccaa$ccaa_iso)#
+cvirus.ccaa=data.frame(region=cvirus.ccaa$ccaa_iso,#
+                  day=as.Date(as.character(cvirus.ccaa$fecha),#
+                              format="%Y-%m-%d"),#
+                  cases=cvirus.ccaa$num_casos)#
+pop=read.table("demcca.csv",header = TRUE,sep=";")#
+pop=data.frame(region=pop$CCAA,pop=pop$pob)[1:19,]#
+pop=pop[order(pop$region),]#
+pop$w=pop$pop/sum(pop$pop)#
+cvirus.ccaa.fat=dcast(cvirus.ccaa,formula = day~region,value.var = "cases")#
+for(j in 2:ncol(cvirus.ccaa.fat)){#
+  y=cvirus.ccaa.fat[,j]#
+  y=c(rep(0,13),y)#
+  y=cumsum(y)#
+  y=y[14:length(y)]-y[1+(0:(length(y)-14))]#
+  cvirus.ccaa.fat[,j]=as.integer((y/pop$pop[pop$region==colnames(cvirus.ccaa.fat)[j]])*100000)#
+}#
+#
+cvirus=cvirus.ccaa.fat#
+last.observed=max(cvirus$day)#
+dim(cvirus)#
+#
+dp=cvirus$day[-1]#
+y=log(1+as.matrix(cvirus[,-1]))#
+yl1=y[-nrow(y),]#
+y=y[-1,]#
+start=7#
+rr=array(NA,dim=dim(y))#
+res=NULL#
+for(ndaysahead in 1:7){#
+for(i in start:nrow(y)){#
+	mymod=lm(as.matrix(y[1:(i-1),])~as.matrix(yl1[1:(i-1),]))#
+	pred=round(exp(predict(mymod,newobs=yl1[1:(i-1+ ndaysahead),])),0)#
+	rr[i+ndaysahead,]=pred[nrow(pred),]#
+}#
+preds=data.frame(day=dp,rr)#
+colnames(preds)=colnames(cvirus)#
+preds$ndaysahead=ndaysahead#
+res=rbind(res,preds)#
+}#
+preds=res
+dp=cvirus$day[-1]#
+y=log(1+as.matrix(cvirus[,-1]))#
+yl1=y[-nrow(y),]#
+y=y[-1,]#
+start=7#
+rr=array(NA,dim=dim(y))#
+res=NULL#
+for(ndaysahead in 1:7){#
+for(i in start:nrow(y)){#
+	mymod=lm(as.matrix(y[1:(i-1),])~as.matrix(yl1[1:(i-1),]))#
+	pred=round(exp(predict(mymod,newobs=yl1[1:(i-1+ndaysahead),])),0)#
+	rr[i+ndaysahead,]=pred[nrow(pred),]#
+}
+preds=data.frame(day=dp,rr)#
+colnames(preds)=colnames(cvirus)#
+preds$ndaysahead=ndaysahead#
+res=rbind(res,preds)#
+}
+ndaysahead
+mymod=lm(as.matrix(y[1:(i-1),])~as.matrix(yl1[1:(i-1),]))#
+	pred=round(exp(predict(mymod,newobs=yl1[1:(i-1+ndaysahead),])),0)#
+	rr[i+ndaysahead,]=pred[nrow(pred),]
+nrow(pred)
+pred[nrow(pred),]
+i+ndaysahead
+dim(rr)
+dp=cvirus$day[-1]#
+y=log(1+as.matrix(cvirus[,-1]))#
+yl1=y[-nrow(y),]#
+y=y[-1,]#
+start=7#
+rr=array(NA,dim=dim(y))#
+res=NULL
+dp=cvirus$day[-1]#
+y=log(1+as.matrix(cvirus[,-1]))#
+yl1=y[-nrow(y),]#
+y=y[-1,]#
+start=7#
+rr=array(NA,dim=dim(y))#
+res=NULL#
+for(ndaysahead in 1:7){#
+for(i in start:(nrow(y)-1))){#
+	mymod=lm(as.matrix(y[1:(i-1),])~as.matrix(yl1[1:(i-1),]))#
+	pred=round(exp(predict(mymod,newobs=yl1[1:(i-1+ndaysahead),])),0)#
+	rr[i+ndaysahead,]=pred[nrow(pred),]#
+}#
+preds=data.frame(day=dp,rr)#
+colnames(preds)=colnames(cvirus)#
+preds$ndaysahead=ndaysahead#
+res=rbind(res,preds)#
+}
+dp=cvirus$day[-1]#
+y=log(1+as.matrix(cvirus[,-1]))#
+yl1=y[-nrow(y),]#
+y=y[-1,]#
+start=7#
+rr=array(NA,dim=dim(y))#
+res=NULL#
+for(ndaysahead in 1:7){#
+for(i in start:(nrow(y)-1)){#
+	mymod=lm(as.matrix(y[1:(i-1),])~as.matrix(yl1[1:(i-1),]))#
+	pred=round(exp(predict(mymod,newobs=yl1[1:(i-1+ndaysahead),])),0)#
+	rr[i+ndaysahead,]=pred[nrow(pred),]#
+}#
+preds=data.frame(day=dp,rr)#
+colnames(preds)=colnames(cvirus)#
+preds$ndaysahead=ndaysahead#
+res=rbind(res,preds)#
+}
+dp=cvirus$day[-1]#
+y=log(1+as.matrix(cvirus[,-1]))#
+yl1=y[-nrow(y),]#
+y=y[-1,]#
+start=7#
+rr=array(NA,dim=dim(y))#
+res=NULL#
+for(ndaysahead in 1:7){#
+for(i in start:nrow(y)){#
+	mymod=lm(as.matrix(y[1:(i-1),])~as.matrix(yl1[1:(i-1),]))#
+	pred=round(exp(predict(mymod,newobs=yl1[1:(i-1+ndaysahead),])),0)#
+	rr[i-1+ndaysahead,]=pred[nrow(pred),]#
+}#
+preds=data.frame(day=dp,rr)#
+colnames(preds)=colnames(cvirus)#
+preds$ndaysahead=ndaysahead#
+res=rbind(res,preds)#
+}
+i-1+ndaysahead
+rr[i-1+ndaysahead,]
+dp=cvirus$day[-1]#
+y=log(1+as.matrix(cvirus[,-1]))#
+yl1=y[-nrow(y),]#
+y=y[-1,]#
+start=7#
+rr=array(NA,dim=dim(y))#
+res=NULL#
+for(ndaysahead in 1:7){#
+for(i in start:(nrow(y)-1)){#
+	mymod=lm(as.matrix(y[1:(i-1),])~as.matrix(yl1[1:(i-1),]))#
+	pred=round(exp(predict(mymod,newobs=yl1[1:(i-1+ndaysahead),])),0)#
+	rr[i-1+ndaysahead,]=pred[nrow(pred),]#
+}#
+preds=data.frame(day=dp,rr)#
+colnames(preds)=colnames(cvirus)#
+preds$ndaysahead=ndaysahead#
+res=rbind(res,preds)#
+}
+i-1+ndaysahead
+ndaysahead
+dp=cvirus$day[-1]#
+y=log(1+as.matrix(cvirus[,-1]))#
+yl1=y[-nrow(y),]#
+y=y[-1,]#
+start=7#
+rr=array(NA,dim=dim(y))#
+res=NULL#
+for(ndaysahead in 1:7){#
+for(i in start:(nrow(y)-ndaysahead)){#
+	mymod=lm(as.matrix(y[1:(i-1),])~as.matrix(yl1[1:(i-1),]))#
+	pred=round(exp(predict(mymod,newobs=yl1[1:(i-1+ndaysahead),])),0)#
+	rr[i-1+ndaysahead,]=pred[nrow(pred),]#
+}#
+preds=data.frame(day=dp,rr)#
+colnames(preds)=colnames(cvirus)#
+preds$ndaysahead=ndaysahead#
+res=rbind(res,preds)#
+}
+preds=res
+dim(pres)
+dim(preds)
+head(preds)
+preds
+obs=cvirus[-nrow(cvirus),]
+errors=data.frame(obs[,-1]-preds[,-1])
+errors=data.frame(obs[,-1]-preds[preds$ndaysahead==1,-1])
+dim(preds[preds$ndaysahead==1,-1])
+colnames(preds)
+errors=data.frame(obs[,-1]-preds[,-c(1,21)])
+errors=data.frame(obs[,-1]-preds[preds$ndaysahead==1,-c(1,21)])
+rm(list=ls())#
+library(reshape2)#
+setwd("/Users/scabras74/gd/Articulos/elvirusdelacorona/covid19-bayes-dl/")#
+ccaa.lab=c("AN", "AR", "AS", "CB", "CE", "CL", "CM", "CN", "CT", #
+           "EX", "GA","IB", "MC", "MD", "ML", "NC","PV", "RI", "VC")#
+cvirus.ccaa=read.table("https://cnecovid.isciii.es/covid19/resources/casos_diag_ccaadecl.csv", #
+                          sep = ",", header = T)#
+maxr=max(which(cvirus.ccaa$fecha==max(cvirus.ccaa$fecha)))#
+cvirus.ccaa$ccaa_iso=factor(cvirus.ccaa$ccaa_iso)#
+cvirus.ccaa=data.frame(region=cvirus.ccaa$ccaa_iso,#
+                  day=as.Date(as.character(cvirus.ccaa$fecha),#
+                              format="%Y-%m-%d"),#
+                  cases=cvirus.ccaa$num_casos)#
+pop=read.table("demcca.csv",header = TRUE,sep=";")#
+pop=data.frame(region=pop$CCAA,pop=pop$pob)[1:19,]#
+pop=pop[order(pop$region),]#
+pop$w=pop$pop/sum(pop$pop)#
+cvirus.ccaa.fat=dcast(cvirus.ccaa,formula = day~region,value.var = "cases")#
+for(j in 2:ncol(cvirus.ccaa.fat)){#
+  y=cvirus.ccaa.fat[,j]#
+  y=c(rep(0,13),y)#
+  y=cumsum(y)#
+  y=y[14:length(y)]-y[1+(0:(length(y)-14))]#
+  cvirus.ccaa.fat[,j]=as.integer((y/pop$pop[pop$region==colnames(cvirus.ccaa.fat)[j]])*100000)#
+}#
+#
+cvirus=cvirus.ccaa.fat#
+last.observed=max(cvirus$day)#
+dim(cvirus)#
+#
+dp=cvirus$day[-1]#
+y=log(1+as.matrix(cvirus[,-1]))#
+yl1=y[-nrow(y),]#
+y=y[-1,]#
+start=7#
+ee=rr=array(NA,dim=dim(y))#
+res=res.errors=NULL#
+for(ndaysahead in 1:7){#
+for(i in start:(nrow(y)-ndaysahead)){#
+	mymod=lm(as.matrix(y[1:(i-1),])~as.matrix(yl1[1:(i-1),]))#
+	pred=round(exp(predict(mymod,newobs=yl1[1:(i-1+ndaysahead),])),0)#
+	rr[i-1+ndaysahead,]=pred[nrow(pred),]#
+	ee[i-1+ndaysahead,]=y[i,]-rr[i-1+ndaysahead,]#
+}#
+preds=data.frame(day=dp,rr)#
+colnames(preds)=colnames(cvirus)#
+preds$ndaysahead=ndaysahead#
+res=rbind(res,preds)#
+errors=data.frame(day=dp,ee)#
+colnames(errors)=colnames(errors)#
+errors$ndaysahead=ndaysahead#
+res.errors=rbind(res.errors, errors)#
+#
+}#
+preds=res#
+errors=res.errors#
+obs=cvirus[-nrow(cvirus),]#
+preds$type="preds"#
+obs$type="obs"
+errors$type="errors"
+dd=rbind(preds,obs,errors)
+colnames(errors)
+rm(list=ls())#
+library(reshape2)#
+setwd("/Users/scabras74/gd/Articulos/elvirusdelacorona/covid19-bayes-dl/")#
+ccaa.lab=c("AN", "AR", "AS", "CB", "CE", "CL", "CM", "CN", "CT", #
+           "EX", "GA","IB", "MC", "MD", "ML", "NC","PV", "RI", "VC")#
+cvirus.ccaa=read.table("https://cnecovid.isciii.es/covid19/resources/casos_diag_ccaadecl.csv", #
+                          sep = ",", header = T)#
+maxr=max(which(cvirus.ccaa$fecha==max(cvirus.ccaa$fecha)))#
+cvirus.ccaa$ccaa_iso=factor(cvirus.ccaa$ccaa_iso)#
+cvirus.ccaa=data.frame(region=cvirus.ccaa$ccaa_iso,#
+                  day=as.Date(as.character(cvirus.ccaa$fecha),#
+                              format="%Y-%m-%d"),#
+                  cases=cvirus.ccaa$num_casos)#
+pop=read.table("demcca.csv",header = TRUE,sep=";")#
+pop=data.frame(region=pop$CCAA,pop=pop$pob)[1:19,]#
+pop=pop[order(pop$region),]#
+pop$w=pop$pop/sum(pop$pop)#
+cvirus.ccaa.fat=dcast(cvirus.ccaa,formula = day~region,value.var = "cases")#
+for(j in 2:ncol(cvirus.ccaa.fat)){#
+  y=cvirus.ccaa.fat[,j]#
+  y=c(rep(0,13),y)#
+  y=cumsum(y)#
+  y=y[14:length(y)]-y[1+(0:(length(y)-14))]#
+  cvirus.ccaa.fat[,j]=as.integer((y/pop$pop[pop$region==colnames(cvirus.ccaa.fat)[j]])*100000)#
+}#
+#
+cvirus=cvirus.ccaa.fat#
+last.observed=max(cvirus$day)#
+dim(cvirus)#
+#
+dp=cvirus$day[-1]#
+y=log(1+as.matrix(cvirus[,-1]))#
+yl1=y[-nrow(y),]#
+y=y[-1,]#
+start=7#
+ee=rr=array(NA,dim=dim(y))#
+res=res.errors=NULL#
+for(ndaysahead in 1:7){#
+for(i in start:(nrow(y)-ndaysahead)){#
+	mymod=lm(as.matrix(y[1:(i-1),])~as.matrix(yl1[1:(i-1),]))#
+	pred=round(exp(predict(mymod,newobs=yl1[1:(i-1+ndaysahead),])),0)#
+	rr[i-1+ndaysahead,]=pred[nrow(pred),]#
+	ee[i-1+ndaysahead,]=y[i,]-rr[i-1+ndaysahead,]#
+}#
+preds=data.frame(day=dp,rr)#
+colnames(preds)=colnames(cvirus)#
+preds$ndaysahead=ndaysahead#
+res=rbind(res,preds)#
+errors=data.frame(day=dp,ee)#
+colnames(errors)=colnames(cvirus)#
+errors$ndaysahead=ndaysahead#
+res.errors=rbind(res.errors, errors)#
+#
+}#
+preds=res#
+errors=res.errors#
+obs=cvirus[-nrow(cvirus),]#
+preds$type="preds"#
+obs$type="obs"#
+errors$type="errors"#
+dd=rbind(preds,obs,errors)
+colnames(preds)
+colnames(obs)
+rm(list=ls())#
+library(reshape2)#
+setwd("/Users/scabras74/gd/Articulos/elvirusdelacorona/covid19-bayes-dl/")#
+ccaa.lab=c("AN", "AR", "AS", "CB", "CE", "CL", "CM", "CN", "CT", #
+           "EX", "GA","IB", "MC", "MD", "ML", "NC","PV", "RI", "VC")#
+cvirus.ccaa=read.table("https://cnecovid.isciii.es/covid19/resources/casos_diag_ccaadecl.csv", #
+                          sep = ",", header = T)#
+maxr=max(which(cvirus.ccaa$fecha==max(cvirus.ccaa$fecha)))#
+cvirus.ccaa$ccaa_iso=factor(cvirus.ccaa$ccaa_iso)#
+cvirus.ccaa=data.frame(region=cvirus.ccaa$ccaa_iso,#
+                  day=as.Date(as.character(cvirus.ccaa$fecha),#
+                              format="%Y-%m-%d"),#
+                  cases=cvirus.ccaa$num_casos)#
+pop=read.table("demcca.csv",header = TRUE,sep=";")#
+pop=data.frame(region=pop$CCAA,pop=pop$pob)[1:19,]#
+pop=pop[order(pop$region),]#
+pop$w=pop$pop/sum(pop$pop)#
+cvirus.ccaa.fat=dcast(cvirus.ccaa,formula = day~region,value.var = "cases")#
+for(j in 2:ncol(cvirus.ccaa.fat)){#
+  y=cvirus.ccaa.fat[,j]#
+  y=c(rep(0,13),y)#
+  y=cumsum(y)#
+  y=y[14:length(y)]-y[1+(0:(length(y)-14))]#
+  cvirus.ccaa.fat[,j]=as.integer((y/pop$pop[pop$region==colnames(cvirus.ccaa.fat)[j]])*100000)#
+}#
+#
+cvirus=cvirus.ccaa.fat#
+last.observed=max(cvirus$day)#
+dim(cvirus)#
+#
+dp=cvirus$day[-1]#
+y=log(1+as.matrix(cvirus[,-1]))#
+yl1=y[-nrow(y),]#
+y=y[-1,]#
+start=7#
+ee=rr=array(NA,dim=dim(y))#
+res=res.errors=NULL#
+for(ndaysahead in 1:7){#
+for(i in start:(nrow(y)-ndaysahead)){#
+	mymod=lm(as.matrix(y[1:(i-1),])~as.matrix(yl1[1:(i-1),]))#
+	pred=round(exp(predict(mymod,newobs=yl1[1:(i-1+ndaysahead),])),0)#
+	rr[i-1+ndaysahead,]=pred[nrow(pred),]#
+	ee[i-1+ndaysahead,]=y[i,]-rr[i-1+ndaysahead,]#
+}#
+preds=data.frame(day=dp,rr)#
+colnames(preds)=colnames(cvirus)#
+preds$ndaysahead=ndaysahead#
+res=rbind(res,preds)#
+errors=data.frame(day=dp,ee)#
+colnames(errors)=colnames(cvirus)#
+errors$ndaysahead=ndaysahead#
+res.errors=rbind(res.errors, errors)#
+#
+}#
+preds=res#
+errors=res.errors#
+obs=cvirus[-nrow(cvirus),]#
+obs$ndaysahead=0#
+preds$type="preds"#
+obs$type="obs"#
+errors$type="errors"#
+dd=rbind(preds,obs,errors)
+dd=melt(dd,value.name="incidence",variable.name="region",id.vars=c("day","type","ndaysahead"))
+error=dd[dd$type=="errors",]
+ggplot(error,aes(x=region,y=error))+geom_violin()
+head(error)
+error
+str(error)
+ggplot(error,aes(x=region,y=incidence,color=ndaysahead))+geom_violin()
+ggplot(error,aes(x=region,y=incidence,fill=ndaysahead))+geom_violin()
+range(errors$incidence)
+range(errors$incidence,na.rm=TRUE)
+range(error$incidence)
+range(error$incidence,na.rm=TRUE)
+ggplot(error,aes(x=region,y=incidence,fill=factor(ndaysahead))))+geom_violin()
+ggplot(error,aes(x=region,y=incidence,color=factor(ndaysahead)))+geom_violin()
+rm(list=ls())#
+library(reshape2)#
+setwd("/Users/scabras74/gd/Articulos/elvirusdelacorona/covid19-bayes-dl/")#
+ccaa.lab=c("AN", "AR", "AS", "CB", "CE", "CL", "CM", "CN", "CT", #
+           "EX", "GA","IB", "MC", "MD", "ML", "NC","PV", "RI", "VC")#
+cvirus.ccaa=read.table("https://cnecovid.isciii.es/covid19/resources/casos_diag_ccaadecl.csv", #
+                          sep = ",", header = T)#
+maxr=max(which(cvirus.ccaa$fecha==max(cvirus.ccaa$fecha)))#
+cvirus.ccaa$ccaa_iso=factor(cvirus.ccaa$ccaa_iso)#
+cvirus.ccaa=data.frame(region=cvirus.ccaa$ccaa_iso,#
+                  day=as.Date(as.character(cvirus.ccaa$fecha),#
+                              format="%Y-%m-%d"),#
+                  cases=cvirus.ccaa$num_casos)#
+pop=read.table("demcca.csv",header = TRUE,sep=";")#
+pop=data.frame(region=pop$CCAA,pop=pop$pob)[1:19,]#
+pop=pop[order(pop$region),]#
+pop$w=pop$pop/sum(pop$pop)#
+cvirus.ccaa.fat=dcast(cvirus.ccaa,formula = day~region,value.var = "cases")#
+for(j in 2:ncol(cvirus.ccaa.fat)){#
+  y=cvirus.ccaa.fat[,j]#
+  y=c(rep(0,13),y)#
+  y=cumsum(y)#
+  y=y[14:length(y)]-y[1+(0:(length(y)-14))]#
+  cvirus.ccaa.fat[,j]=as.integer((y/pop$pop[pop$region==colnames(cvirus.ccaa.fat)[j]])*100000)#
+}#
+#
+cvirus=cvirus.ccaa.fat#
+last.observed=max(cvirus$day)#
+dim(cvirus)#
+#
+dp=cvirus$day[-1]#
+y=log(1+as.matrix(cvirus[,-1]))#
+yl1=y[-nrow(y),]#
+y=y[-1,]#
+start=7#
+ee=rr=array(NA,dim=dim(y))#
+res=res.errors=NULL#
+for(ndaysahead in 1:7){#
+for(i in start:(nrow(y)-ndaysahead)){#
+	mymod=lm(as.matrix(y[1:(i-1),])~as.matrix(yl1[1:(i-1),]))#
+	pred=round(exp(predict(mymod,newobs=yl1[1:(i-1+ndaysahead),])),0)#
+	rr[i-1+ndaysahead,]=pred[nrow(pred),]#
+	ee[i-1+ndaysahead,]=y[i-1+ndaysahead,]-rr[i-1+ndaysahead,]#
+}#
+preds=data.frame(day=dp,rr)#
+colnames(preds)=colnames(cvirus)#
+preds$ndaysahead=ndaysahead#
+res=rbind(res,preds)#
+errors=data.frame(day=dp,ee)#
+colnames(errors)=colnames(cvirus)#
+errors$ndaysahead=ndaysahead#
+res.errors=rbind(res.errors, errors)#
+#
+}#
+preds=res#
+errors=res.errors#
+obs=cvirus[-nrow(cvirus),]#
+obs$ndaysahead=0#
+preds$type="preds"#
+obs$type="obs"#
+errors$type="errors"#
+dd=rbind(preds,obs,errors)#
+#
+dd=melt(dd,value.name="incidence",variable.name="region",id.vars=c("day","type","ndaysahead"))#
+#
+library(ggplot2)#
+#ggplot(dd,aes(x=day,y=incidence,col=type))+facet_wrap(. ~ region)+#
+#geom_line()+#
+#theme(axis.text.x = element_text(angle = 90,size=rel(0.8)))#
+#
+error=dd[dd$type=="errors",]#
+ggplot(error,aes(x=region,y=incidence,color=factor(ndaysahead)))+geom_violin()
+rm(list=ls())#
+library(reshape2)#
+setwd("/Users/scabras74/gd/Articulos/elvirusdelacorona/covid19-bayes-dl/")#
+ccaa.lab=c("AN", "AR", "AS", "CB", "CE", "CL", "CM", "CN", "CT", #
+           "EX", "GA","IB", "MC", "MD", "ML", "NC","PV", "RI", "VC")#
+cvirus.ccaa=read.table("https://cnecovid.isciii.es/covid19/resources/casos_diag_ccaadecl.csv", #
+                          sep = ",", header = T)#
+maxr=max(which(cvirus.ccaa$fecha==max(cvirus.ccaa$fecha)))#
+cvirus.ccaa$ccaa_iso=factor(cvirus.ccaa$ccaa_iso)#
+cvirus.ccaa=data.frame(region=cvirus.ccaa$ccaa_iso,#
+                  day=as.Date(as.character(cvirus.ccaa$fecha),#
+                              format="%Y-%m-%d"),#
+                  cases=cvirus.ccaa$num_casos)#
+pop=read.table("demcca.csv",header = TRUE,sep=";")#
+pop=data.frame(region=pop$CCAA,pop=pop$pob)[1:19,]#
+pop=pop[order(pop$region),]#
+pop$w=pop$pop/sum(pop$pop)#
+cvirus.ccaa.fat=dcast(cvirus.ccaa,formula = day~region,value.var = "cases")#
+for(j in 2:ncol(cvirus.ccaa.fat)){#
+  y=cvirus.ccaa.fat[,j]#
+  y=c(rep(0,13),y)#
+  y=cumsum(y)#
+  y=y[14:length(y)]-y[1+(0:(length(y)-14))]#
+  cvirus.ccaa.fat[,j]=as.integer((y/pop$pop[pop$region==colnames(cvirus.ccaa.fat)[j]])*100000)#
+}#
+#
+cvirus=cvirus.ccaa.fat#
+last.observed=max(cvirus$day)#
+dim(cvirus)#
+#
+dp=cvirus$day[-1]#
+y=log(1+as.matrix(cvirus[,-1]))#
+yl1=y[-nrow(y),]#
+y=y[-1,]#
+start=7#
+ee=rr=array(NA,dim=dim(y))#
+res=res.errors=NULL#
+for(ndaysahead in 1:7){#
+for(i in start:(nrow(y)-ndaysahead)){#
+	mymod=lm(as.matrix(y[1:(i-1),])~as.matrix(yl1[1:(i-1),]))#
+	pred=round(exp(predict(mymod,newobs=yl1[1:(i-1+ndaysahead),])),0)#
+	rr[i+ndaysahead,]=pred[nrow(pred),]#
+	ee[i+ndaysahead,]=y[i+ndaysahead,]-rr[i+ndaysahead,]#
+}#
+preds=data.frame(day=dp,rr)#
+colnames(preds)=colnames(cvirus)#
+preds$ndaysahead=ndaysahead#
+res=rbind(res,preds)#
+errors=data.frame(day=dp,ee)#
+colnames(errors)=colnames(cvirus)#
+errors$ndaysahead=ndaysahead#
+res.errors=rbind(res.errors, errors)#
+#
+}
+rm(list=ls())#
+library(reshape2)#
+setwd("/Users/scabras74/gd/Articulos/elvirusdelacorona/covid19-bayes-dl/")#
+ccaa.lab=c("AN", "AR", "AS", "CB", "CE", "CL", "CM", "CN", "CT", #
+           "EX", "GA","IB", "MC", "MD", "ML", "NC","PV", "RI", "VC")#
+cvirus.ccaa=read.table("https://cnecovid.isciii.es/covid19/resources/casos_diag_ccaadecl.csv", #
+                          sep = ",", header = T)#
+maxr=max(which(cvirus.ccaa$fecha==max(cvirus.ccaa$fecha)))#
+cvirus.ccaa$ccaa_iso=factor(cvirus.ccaa$ccaa_iso)#
+cvirus.ccaa=data.frame(region=cvirus.ccaa$ccaa_iso,#
+                  day=as.Date(as.character(cvirus.ccaa$fecha),#
+                              format="%Y-%m-%d"),#
+                  cases=cvirus.ccaa$num_casos)#
+pop=read.table("demcca.csv",header = TRUE,sep=";")#
+pop=data.frame(region=pop$CCAA,pop=pop$pob)[1:19,]#
+pop=pop[order(pop$region),]#
+pop$w=pop$pop/sum(pop$pop)#
+cvirus.ccaa.fat=dcast(cvirus.ccaa,formula = day~region,value.var = "cases")#
+for(j in 2:ncol(cvirus.ccaa.fat)){#
+  y=cvirus.ccaa.fat[,j]#
+  y=c(rep(0,13),y)#
+  y=cumsum(y)#
+  y=y[14:length(y)]-y[1+(0:(length(y)-14))]#
+  cvirus.ccaa.fat[,j]=as.integer((y/pop$pop[pop$region==colnames(cvirus.ccaa.fat)[j]])*100000)#
+}#
+#
+cvirus=cvirus.ccaa.fat#
+last.observed=max(cvirus$day)#
+dim(cvirus)#
+#
+dp=cvirus$day[-1]#
+y=log(1+as.matrix(cvirus[,-1]))#
+yl1=y[-nrow(y),]#
+y=y[-1,]#
+start=7#
+ee=rr=array(NA,dim=dim(y))#
+res=res.errors=NULL#
+for(ndaysahead in 1:7){#
+for(i in start:(nrow(y)-ndaysahead)){#
+	mymod=lm(as.matrix(y[1:(i-1),])~as.matrix(yl1[1:(i-1),]))#
+	pred=round(exp(predict(mymod,newobs=yl1[1:(i+ndaysahead),])),0)#
+	rr[i+ndaysahead,]=pred[nrow(pred),]#
+	ee[i+ndaysahead,]=y[i+ndaysahead,]-rr[i+ndaysahead,]#
+}#
+preds=data.frame(day=dp,rr)#
+colnames(preds)=colnames(cvirus)#
+preds$ndaysahead=ndaysahead#
+res=rbind(res,preds)#
+errors=data.frame(day=dp,ee)#
+colnames(errors)=colnames(cvirus)#
+errors$ndaysahead=ndaysahead#
+res.errors=rbind(res.errors, errors)#
+#
+}
+preds=res#
+errors=res.errors#
+obs=cvirus[-nrow(cvirus),]#
+obs$ndaysahead=0#
+preds$type="preds"#
+obs$type="obs"#
+errors$type="errors"#
+dd=rbind(preds,obs,errors)
+dd=melt(dd,value.name="incidence",variable.name="region",id.vars=c("day","type","ndaysahead"))#
+#
+library(ggplot2)#
+#ggplot(dd,aes(x=day,y=incidence,col=type))+facet_wrap(. ~ region)+#
+#geom_line()+#
+#theme(axis.text.x = element_text(angle = 90,size=rel(0.8)))#
+#
+error=dd[dd$type=="errors",]#
+ggplot(error,aes(x=region,y=incidence,color=factor(ndaysahead)))+geom_violin()
+ee
+ndaysahead=!
+ndaysahead=1
+for(i in start:(nrow(y)-ndaysahead)){#
+	mymod=lm(as.matrix(y[1:(i-1),])~as.matrix(yl1[1:(i-1),]))#
+	pred=round(exp(predict(mymod,newobs=yl1[1:(i+ndaysahead),])),0)#
+	rr[i+ndaysahead,]=pred[nrow(pred),]#
+	ee[i+ndaysahead,]=y[i+ndaysahead,]-rr[i+ndaysahead,]#
+}
+hist(ee)
+rm(list=ls())#
+library(reshape2)#
+setwd("/Users/scabras74/gd/Articulos/elvirusdelacorona/covid19-bayes-dl/")#
+ccaa.lab=c("AN", "AR", "AS", "CB", "CE", "CL", "CM", "CN", "CT", #
+           "EX", "GA","IB", "MC", "MD", "ML", "NC","PV", "RI", "VC")#
+cvirus.ccaa=read.table("https://cnecovid.isciii.es/covid19/resources/casos_diag_ccaadecl.csv", #
+                          sep = ",", header = T)#
+maxr=max(which(cvirus.ccaa$fecha==max(cvirus.ccaa$fecha)))#
+cvirus.ccaa$ccaa_iso=factor(cvirus.ccaa$ccaa_iso)#
+cvirus.ccaa=data.frame(region=cvirus.ccaa$ccaa_iso,#
+                  day=as.Date(as.character(cvirus.ccaa$fecha),#
+                              format="%Y-%m-%d"),#
+                  cases=cvirus.ccaa$num_casos)#
+pop=read.table("demcca.csv",header = TRUE,sep=";")#
+pop=data.frame(region=pop$CCAA,pop=pop$pob)[1:19,]#
+pop=pop[order(pop$region),]#
+pop$w=pop$pop/sum(pop$pop)#
+cvirus.ccaa.fat=dcast(cvirus.ccaa,formula = day~region,value.var = "cases")#
+for(j in 2:ncol(cvirus.ccaa.fat)){#
+  y=cvirus.ccaa.fat[,j]#
+  y=c(rep(0,13),y)#
+  y=cumsum(y)#
+  y=y[14:length(y)]-y[1+(0:(length(y)-14))]#
+  cvirus.ccaa.fat[,j]=as.integer((y/pop$pop[pop$region==colnames(cvirus.ccaa.fat)[j]])*100000)#
+}#
+#
+cvirus=cvirus.ccaa.fat#
+last.observed=max(cvirus$day)#
+dim(cvirus)#
+#
+dp=cvirus$day[-1]#
+y=log(1+as.matrix(cvirus[,-1]))#
+yl1=y[-nrow(y),]#
+y=y[-1,]#
+start=7#
+ee=rr=array(NA,dim=dim(y))#
+res=res.errors=NULL#
+for(ndaysahead in 1:7){#
+for(i in start:(nrow(y)-ndaysahead)){#
+	mymod=lm(as.matrix(y[1:(i-1),])~as.matrix(yl1[1:(i-1),]))#
+	pred=round(exp(predict(mymod,newobs=yl1[1:(i+ndaysahead),])),0)#
+	rr[i+ndaysahead,]=pred[nrow(pred),]#
+	ee[i+ndaysahead,]=(exp(y[i+ndaysahead,])-1)-rr[i+ndaysahead,]#
+}#
+preds=data.frame(day=dp,rr)#
+colnames(preds)=colnames(cvirus)#
+preds$ndaysahead=ndaysahead#
+res=rbind(res,preds)#
+errors=data.frame(day=dp,ee)#
+colnames(errors)=colnames(cvirus)#
+errors$ndaysahead=ndaysahead#
+res.errors=rbind(res.errors, errors)#
+#
+}#
+#
+preds=res#
+errors=res.errors#
+obs=cvirus[-nrow(cvirus),]#
+obs$ndaysahead=0#
+preds$type="preds"#
+obs$type="obs"#
+errors$type="errors"#
+dd=rbind(preds,obs,errors)#
+#
+dd=melt(dd,value.name="incidence",variable.name="region",id.vars=c("day","type","ndaysahead"))#
+#
+library(ggplot2)#
+#ggplot(dd,aes(x=day,y=incidence,col=type))+facet_wrap(. ~ region)+#
+#geom_line()+#
+#theme(axis.text.x = element_text(angle = 90,size=rel(0.8)))#
+#
+error=dd[dd$type=="errors",]#
+ggplot(error,aes(x=region,y=incidence,color=factor(ndaysahead)))+geom_violin()
+ggplot(error,aes(x=ndaysahead,y= incidence))+#
+  facet_wrap(. ~ region)+geom_violin()+ ylab("Incidence")
+ggplot(error,aes(x=factor(ndaysahead),y= incidence))+#
+  facet_wrap(. ~ region)+geom_violin()+ ylab("Incidence")
+pdf(file="~/gd/Dropbox/Applicazioni/Overleaf/A Bayesian-DL model for estimating Covid-19 evolution in Spain/fig/errorslm.pdf")#
+ggplot(error,aes(x=factor(ndaysahead),y= incidence))+#
+  facet_wrap(. ~ region)+geom_violin()+ ylab("Incidence")#
+dev.off()
+pdf(file="/Users/scabras74/gd/Dropbox/Applicazioni/Overleaf/A Bayesian-DL model for estimating Covid-19 evolution in Spain/fig/errorslm.pdf")#
+ggplot(error,aes(x=factor(ndaysahead),y= incidence))+#
+  facet_wrap(. ~ region)+geom_violin()+ ylab("Incidence")#
+dev.off()
+pdf(file="/Users/scabras74/gd/Articulos/elvirusdelacorona/mathematics/errorslm.pdf")#
+ggplot(error,aes(x=factor(ndaysahead),y= incidence))+#
+  facet_wrap(. ~ region)+geom_violin()+ ylab("Incidence")#
+dev.off()
