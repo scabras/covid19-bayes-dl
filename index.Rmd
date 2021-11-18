@@ -72,9 +72,6 @@ p=ggplot(meltdat, aes(x =day, y = Incidence,color=region))+
   geom_line()+
   theme(axis.text.x = element_text(angle = 90,size=rel(0.8)))+ theme_bw()
 p
-pdf(file="~/gd/Articulos/elvirusdelacorona/mathematics/obsinc.pdf")
-print(p)
-dev.off()
 ```
 
 
@@ -172,14 +169,9 @@ The model is learning from the data because the prediction error decreases.
 ```{r modtrainres}
 history=read.csv("dlio/history.csv")
 history=history*sd(unlist(cvirus[,-1]))
-p=ggplot(history,aes(x=1:nrow(history),y=val_loss))+
+ggplot(history,aes(x=1:nrow(history),y=val_loss))+
   geom_point()+geom_smooth()+xlab("Epoch")+
   ylab("Mean Squared Error (Incidence)")+ theme_bw()
-p
-
-pdf(file="~/gd/Articulos/elvirusdelacorona/mathematics/history.pdf")
-p
-dev.off()
 ```
 
 
@@ -187,35 +179,20 @@ These are the errors depending on how many days before was made the prediction (
 
 
 ```{r lstmerror}
-p=ggplot(allerror,aes(x=factor(delay),y=error))+
+ggplot(allerror,aes(x=factor(delay),y=error))+
   facet_wrap(. ~ region)+geom_violin()+ ylab("Incidence")+ theme_bw()
-p
-pdf(file="~/gd/Articulos/elvirusdelacorona/mathematics/errors.pdf")
-p
-dev.off()
 ```
 
 These are the LSTM predictions (prior means):
 
 ```{r lstmpred}
-p1=ggplot(subset(allres,(delay%in%c(0,1))),
+ggplot(subset(allres,(delay%in%c(0,1))),
           aes(x=day,y=cases,color=type))+facet_wrap(. ~ region)+geom_line()+ theme_bw() +
   theme(axis.text.x = element_text(angle = 90,size=rel(1)))
 
-pmax=ggplot(subset(allres,day>as.Date("2021-01-01")),aes(x=day,y=cases,color=type))+
+ggplot(subset(allres,day>as.Date("2021-01-01")),aes(x=day,y=cases,color=type))+
   facet_wrap(. ~ region)+geom_line()+
   theme(axis.text.x = element_text(angle = 90,size=rel(0.8)))+ ylab("Incidence")+ theme_bw()
-
-p1
-pmax
-
-pdf(file="~/gd/Articulos/elvirusdelacorona/mathematics/preds1.pdf")
-p1
-dev.off()
-
-pdf(file="~/gd/Articulos/elvirusdelacorona/mathematics/predsmax.pdf")
-pmax
-dev.off()
 ```
 
 Such output contains a guess of the process filtration $\mathcal{F_{t-1}}$ in $P$.
@@ -272,21 +249,13 @@ For each region here is the observed incidence along with predictive posterior s
 
 ```{r regpredinc}
 toplot=subset(final.res,day>as.Date("2021-01-01"))
-toplot=toplot[toplot$delay==7,]
-pmax=ggplot(toplot,aes(x=day,y=observed))+geom_line()+
-  geom_line(aes(x=day,y=median),colour="red")+
+toplot=toplot[toplot$delay==1,]
+ggplot(toplot,aes(x=day,y=observed))+geom_line()+
+geom_line(aes(x=day,y=median),colour="red")+
   geom_ribbon(aes(x=day,ymin=ici,ymax=sci),alpha = 0.5)+
               facet_wrap(. ~ region)+
               theme(axis.text.x = element_text(angle = 90,size=rel(0.8)))+
   ylab("Incidence")+ theme_bw()
-pmax
-
-pdf(file="~/gd/Articulos/elvirusdelacorona/mathematics/bayes-preds1.pdf")
-pmax
-dev.off()
-
-toplot=subset(final.res,day>as.Date("2021-01-01"))
-
 datatable(toplot[is.na(toplot$observed),],rownames = NULL)
 ```
 
@@ -298,126 +267,14 @@ The same as above but for all Spain in which regions are weighted according to t
 final.res.spain=round(final.res[c("observed","ici","median","sci")]*pop$w[final.res$region],0)
 final.res.spain=aggregate(final.res.spain,by=list(day=final.res$day,delay=final.res$delay),sum)
 
-toplot=subset(final.res.spain,day>as.Date("2021-01-01"))
-toplot=toplot[toplot$delay==7,]
+toplot=subset(final.res.spain,day>as.Date("2021-11-01"))
+toplot=toplot[toplot$delay==1,]
 pmax=ggplot(toplot,aes(x=day,y=observed))+geom_line()+
   geom_line(aes(x=day,y=median),colour="red")+
   geom_ribbon(aes(x=day,ymin=ici,ymax=sci),alpha = 0.5)+
               theme(axis.text.x = element_text(angle = 90,size=rel(0.8)))+
   ylab("Incidence")+ theme_bw()
-pmax
-
-pdf(file="~/gd/Articulos/elvirusdelacorona/mathematics/bayes-preds-spain1.pdf")
-pmax
-dev.off()
-
-toplot=subset(final.res.spain,day>as.Date("2021-01-01"))
 
 datatable(toplot[is.na(toplot$observed),],rownames = NULL)
 
-```
-
-## Evaluation on the test set
-
-If the model where trained upto `r last.observed-max_delay` these are the Bayesian predictions
-
-```{r testsetoutput}
-final.res.test=bayes.pred(allres.bayes.test,no.obs = TRUE)
-toplot=subset(final.res.test,(day>last.observed-max_delay)&(day<=last.observed))
-toplot=toplot[(toplot$day-min(toplot$day)+1)==toplot$delay,]
-pmax=ggplot(toplot,aes(x=day,y=observed))+geom_line()+
-  geom_line(aes(x=day,y=median),colour="red")+
-  geom_ribbon(aes(x=day,ymin=ici,ymax=sci),alpha = 0.5)+
-              facet_wrap(. ~ region)+
-              theme(axis.text.x = element_text(angle = 90,size=rel(0.8)))+
-  ylab("Incidence")+ theme_bw()
-pmax
-
-pdf(file="~/gd/Articulos/elvirusdelacorona/mathematics/bayes-predsmaxtest.pdf")
-pmax
-dev.off()
-
-ee=final.res.test
-ee=ee[(ee$day>"2021-10-11")&((ee$day<="2021-10-18")),]
-ee=ee[ee$day-as.Date("2021-10-11")==ee$delay,]
-
-library(xtable)
-tt=ee[c("day","region","ici","observed","median","sci")]
-colnames(tt)=c("day","region","inf (0.5\\%)","obs.","pred (50\\%)","sup (99.5\\%)")
-tt=melt(tt,id.vars = c("day","region"))
-tt=dcast(tt,region+variable~day)
-print(xtable(tt,digits = 0),include.rownames=FALSE)
-
-rr=ee$observed-ee$median
-sd(rr)
-sqrt(mean((rr)^2))
-summary(rr)
-mean(ee$observed>ee$ici&ee$observed<ee$sci)
-
-
-```
-
-
-
-# What if scenarios and predictions
-
-Here we just present some of the possibilities offered by the model in estimating hypothetical situations.
-
-## Scenario 1.
-
-Suppose that the last 10 days incidence in the Madrid region was incremented by 5% every day. What should be the impact on other regions and the rest of the country?
-
-```{r sc1preds}
-last.days=(nrow(cvirus)-19):(nrow(cvirus))
-datsc1=cvirus
-datsc1$MD[last.days]=datsc1$MD[min(last.days)]*(1.1)^((1:20))
-est.lstm(datsc1)
-tt1=collect.lstmoutout(datsc1)
-allres.bayes1=tt1[[1]]
-final.res1=bayes.pred(allres.bayes1)
-final.res1[c("ici","median","sci")]=final.res1[c("ici","median","sci")]/final.res[c("ici","median","sci")]
-toplot=subset(final.res1,day>min(cvirus$day[last.days]))
-toplot=toplot[toplot$delay==1,]
-
-pmax=ggplot(toplot,aes(x=day,y=median))+geom_line(colour="red")+
-  geom_ribbon(aes(x=day,ymin=ici,ymax=sci),alpha = 0.5)+
-  facet_wrap(. ~ region)+
-  theme(axis.text.x = element_text(angle = 90,size=rel(0.8)))+
-  ylab("Ratio of predicted incidence (scenario vs actual)")+ theme_bw()
-
-pmax
-
-
-pdf(file="~/gd/Articulos/elvirusdelacorona/mathematics/sc1.pdf")
-print(pmax)
-dev.off()
-```
-
-
-## Scenario 2.
-
-Suppose that the same hypothetical incidence in the first case were observed Canary Islands instead of Madrid:
-
-```{r sc2preds}
-datsc2=cvirus
-datsc2$CN[last.days]=datsc1$MD[last.days]
-est.lstm(datsc2)
-tt2=collect.lstmoutout(datsc2)
-allres.bayes2=tt2[[1]]
-final.res2=bayes.pred(allres.bayes2)
-final.res2[c("ici","median","sci")]=final.res2[c("ici","median","sci")]/final.res[c("ici","median","sci")]
-toplot=subset(final.res2,day>as.Date("2021-01-01"))
-toplot=toplot[toplot$delay==1,]
-
-pmax=ggplot(toplot,aes(x=day,y=median))+geom_line(colour="red")+
-  geom_ribbon(aes(x=day,ymin=ici,ymax=sci),alpha = 0.5)+
-  facet_wrap(. ~ region)+
-  theme(axis.text.x = element_text(angle = 90,size=rel(0.8)))+
-  ylab("Ratio of predicted incidence (scenario vs actual)")+ theme_bw()
-
-pmax
-
-pdf(file="~/gd/Articulos/elvirusdelacorona/mathematics/sc2.pdf")
-print(pmax)
-dev.off()
 ```
