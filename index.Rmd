@@ -20,6 +20,12 @@ library(ggplot2)
 library(DT)
 ```
 
+# Manuscript
+
+The model here implemented is documented in 
+
+Stefano Cabras, A Bayesian-Deep Learning Model for Estimating COVID-19 Evolution in Spain, *Mathematics*, **9**(22), 2921, 2021. (https://doi.org/10.3390/math9222921)
+
 
 # Data preparation
 
@@ -202,7 +208,7 @@ Such output contains a guess of the process filtration $\mathcal{F_{t-1}}$ in $P
 
 To account for prediction uncertainty we assume that the LSTM prediction and the corresponding errors act as an expert who elicits the mean of the Poisson (the LSTM prediction) along with its variance (the LSTM mean squared error). The variances are calculated conditionally to the region and the number of days ahead in the prediction (delay).
 
-The Negative Binomial Bayesian Model predictive posterior is calculated here.
+The Negative Binomial Bayesian Model predictive posterior is calculated here. In particular the model reports the posterior median along with 90% Credible Intervals.
 
 
 ```{r negbin}
@@ -224,8 +230,8 @@ bayes.pred=function(allres.bayes,no.obs=FALSE){
   oo=obs$cases
   oo[ii]=0
   size=a+oo # Predictive posterior size parameter
-  post.pred.summary=t(apply(cbind(size,p),1,function(x) qnbinom(c(0.005,0.5,0.995),size=x[1],prob=x[2])))
-  colnames(post.pred.summary)=c("ici","median","sci")
+  post.pred.summary=t(apply(cbind(size,p),1,function(x) qnbinom(c(0.05,0.5,0.95),size=x[1],prob=x[2])))
+  colnames(post.pred.summary)=c("Inf90","median","Sup90")
   final.res=data.frame(day=preds$day,delay=preds$delay,
                        region=preds$region,
                        lstm=preds$cases,observed=obs$cases,post.pred.summary)
@@ -249,13 +255,14 @@ For each region here is the observed incidence along with predictive posterior s
 
 ```{r regpredinc}
 toplot=subset(final.res,day>as.Date("2021-01-01"))
-toplot=toplot[toplot$delay==1,]
+toplot=toplot[toplot$delay>=1,]
 ggplot(toplot,aes(x=day,y=observed))+geom_line()+
 geom_line(aes(x=day,y=median),colour="red")+
-  geom_ribbon(aes(x=day,ymin=ici,ymax=sci),alpha = 0.5)+
+  geom_ribbon(aes(x=day,ymin=Inf90,ymax=Sup90),alpha = 0.5)+
               facet_wrap(. ~ region)+
               theme(axis.text.x = element_text(angle = 90,size=rel(0.8)))+
   ylab("Incidence")+ theme_bw()
+
 datatable(toplot[is.na(toplot$observed),],rownames = NULL)
 ```
 
@@ -264,14 +271,14 @@ datatable(toplot[is.na(toplot$observed),],rownames = NULL)
 The same as above but for all Spain in which regions are weighted according to their population.
 
 ```{r}
-final.res.spain=round(final.res[c("observed","ici","median","sci")]*pop$w[final.res$region],0)
+final.res.spain=round(final.res[c("observed","Inf90","median","Sup90")]*pop$w[final.res$region],0)
 final.res.spain=aggregate(final.res.spain,by=list(day=final.res$day,delay=final.res$delay),sum)
 
 toplot=subset(final.res.spain,day>as.Date("2021-11-01"))
-toplot=toplot[toplot$delay==1,]
+toplot=toplot[toplot$delay>=1,]
 pmax=ggplot(toplot,aes(x=day,y=observed))+geom_line()+
   geom_line(aes(x=day,y=median),colour="red")+
-  geom_ribbon(aes(x=day,ymin=ici,ymax=sci),alpha = 0.5)+
+  geom_ribbon(aes(x=day,ymin=Inf90,ymax=Sup90),alpha = 0.5)+
               theme(axis.text.x = element_text(angle = 90,size=rel(0.8)))+
   ylab("Incidence")+ theme_bw()
 
