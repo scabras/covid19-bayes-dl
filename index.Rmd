@@ -9,11 +9,13 @@ output: html_document
 rm(list=ls())
 knitr::opts_chunk$set(echo = TRUE,warning = FALSE)
 library(reticulate)
-#Sys.setenv(RETICULATE_MINICONDA_PATH = "~/miniforge3/")
-#use_python("~/miniforge3/bin/python")
-#use_condaenv("~/miniforge3/envs/r-reticulate/")
-#conda_python(envname = "~/miniforge3/envs/r-reticulate/bin/python")
-#conda_binary()
+Sys.setenv(RETICULATE_MINICONDA_PATH = "~/miniforge3/")
+Sys.setenv(RETICULATE_PYTHON = "~/miniforge3/envs/r-reticulate/bin/python")
+use_python("~/miniforge3/envs/r-reticulate/bin/python")
+use_condaenv("~/miniforge3/envs/r-reticulate/")
+conda_python(envname = "~/miniforge3/envs/r-reticulate")
+conda_binary()
+
 
 library(reshape2)
 library(ggplot2)
@@ -157,7 +159,7 @@ Here we estimate twice the model: the first for evaluating performance on test s
 ```{r lstmtraintest}
 max_delay=length(list.files(path = "dlio",pattern = "civout-test"))
 est.lstm(cvirus,test.from=last.observed-max_delay) # Model evaluation on Test set
-max_delay=7
+max_delay=60
 tt=collect.lstmoutout(cvirus,testset = TRUE)
 allres.test=tt[[2]]
 allerror.test=tt[[3]]
@@ -282,6 +284,7 @@ pmax=ggplot(toplot,aes(x=day,y=observed))+geom_line()+
               theme(axis.text.x = element_text(angle = 90,size=rel(0.8)))+
   ylab("Incidence")+ theme_bw()
 
+pmax
 datatable(toplot[is.na(toplot$observed),],rownames = NULL)
 
 ```
